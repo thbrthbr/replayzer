@@ -54,6 +54,7 @@
         border-radius: 5px;
         border-width: 1px;
         border-color: #accfff;
+        color: black;
         background-color: white;
         font-size: 15px;
       }
@@ -88,8 +89,9 @@
         border-style: solid;
         border-radius: 5px;
         border-width: 1px;
-        border-color: #accfff;
         font-size: 15px;
+        border-color: #accfff;
+        color: black;
         background-color: white;
       }
       .upload-button:hover {
@@ -100,6 +102,15 @@
       .file-text {
         margin: 0;
         padding: 0;
+      }
+      .search-line {
+        margin: 2px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .search-input {
+        font-size: 20px;
       }
     </style>
   </head>
@@ -125,6 +136,15 @@
         </button>
       </div>
     </form>
+    <div class="search-line">
+      <button class="upload-button" onclick="refresh()">
+        <i class="fa-solid fa-arrows-rotate"></i>
+      </button>
+      <input class="search-input" type="text" />
+      <button type="button" class="upload-button" onclick="search()">
+        SEARCH
+      </button>
+    </div>
     <ul id="list"></ul>
     <script>
       axios({
@@ -183,7 +203,6 @@
       };
       const upload = async () => {
         const file = document.querySelector('#replay-upload');
-        console.log(file.files[0]);
         if (file.files.length == 0) {
           alert('파일을 선택해주세요');
           return;
@@ -201,7 +220,6 @@
           },
         });
         if (res.data.status == '성공') {
-          console.log(res.data);
           for (let i = 0; i < res.data.dataName.length; i++) {
             let li = document.createElement('li');
             li.id = 'list-item';
@@ -219,12 +237,60 @@
                 alert('이동실패');
               }
             };
-            document.querySelector('#list').append(li);
+            document
+              .querySelector('#list')
+              .insertBefore(li, document.querySelector('#list').firstChild);
           }
+          $('#replay-upload').val('');
+          document.querySelector('.upload-button').style.cssText = `
+            border-color: #accfff;
+            color: black;
+            background-color: white;
+          `;
+
           alert('업로드 성공');
         } else {
           alert('업로드 실패');
         }
+      };
+
+      const search = async () => {
+        let keyword = document.querySelector('.search-input').value;
+        let res = await axios({
+          method: 'post',
+          url: '/search',
+          data: { keyword: keyword },
+        });
+        if (res.data.status == '성공') {
+          let list = res.data.data.reverse();
+          let ul = document.querySelector('#list');
+          ul.innerHTML = '';
+          for (let i = 0; i < list.length; i++) {
+            let li = document.createElement('li');
+            li.id = 'list-item';
+            let title = list[i].fileName;
+            li.innerText = list[i].title;
+            li.onclick = async () => {
+              let res = await axios({
+                method: 'post',
+                url: '/select',
+                data: { data: title },
+              });
+              if (res.data == '성공') {
+                window.location.href = '/open';
+              } else {
+                alert('이동실패');
+              }
+            };
+            ul.append(li);
+          }
+        } else {
+          alert('데이터를 불러오지 못했습니다');
+        }
+      };
+
+      const refresh = () => {
+        window.location.reload();
       };
     </script>
   </body>

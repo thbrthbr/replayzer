@@ -30,4 +30,5 @@ router.post('/select', Controller.select);
 router.get('/replay/load', Controller.load);
 router.get('/open', Controller.show);
 router.get('/replayShow', Controller.replayShow);
+router.post('/search', Controller.search);
 module.exports = router;

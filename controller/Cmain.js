@@ -9,7 +9,6 @@ exports.intro = (req, res) => {
 
 exports.getList = async (req, res) => {
   let list = await List.findAll();
-  console.log(list);
   let arr = [];
   for (let i = 0; i < list.length; i++) {
     let obj = {
@@ -27,10 +26,8 @@ exports.show = (req, res) => {
 
 exports.select = (req, res) => {
   try {
-    console.log(req.body);
     dataQueue.shift();
     dataQueue.push(req.body.data);
-    console.log(dataQueue);
     res.send('성공');
   } catch (e) {
     res.send('실패');
@@ -41,7 +38,6 @@ exports.upload = async (req, res) => {
   try {
     let arr = [];
     let openArr = [];
-    console.log(req.files);
     for (let i = 0; i < req.files.length; i++) {
       let name = req.files[i].originalname.split('.')[0];
       arr.push(name);
@@ -65,4 +61,23 @@ exports.load = (req, res) => {
 exports.replayShow = (req, res) => {
   console.log(req.params);
   res.render(dataQueue[0]);
+};
+
+exports.search = async (req, res) => {
+  try {
+    let result = await List.findAll();
+    let arr = [];
+    for (let i = 0; i < result.length; i++) {
+      if (result[i].dataValues.title.includes(req.body.keyword)) {
+        let obj = {
+          title: result[i].dataValues.title,
+          fileName: result[i].dataValues.fileName,
+        };
+        arr.push(obj);
+      }
+    }
+    res.send({ status: '성공', data: arr });
+  } catch (e) {
+    ㄱes.send({ status: '실패' });
+  }
 };
