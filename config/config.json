@@ -16,7 +16,7 @@
   "production": {
     "username": "admin",
     "password": "12345678",
-    "database": "database_production",
+    "database": "production",
     "host": "kdt-lecture-test.c0m1fdifsbpq.us-east-2.rds.amazonaws.com",
     "dialect": "mysql"
   }
