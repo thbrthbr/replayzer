@@ -3,13 +3,127 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      src="https://code.jquery.com/jquery-3.7.0.min.js"
+      integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g="
+      crossorigin="anonymous"
+    ></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
     <title>REPLAYZER</title>
+    <style>
+      body {
+        background-color: #1e1424;
+      }
+      .logo {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+      }
+      #list {
+        list-style: none;
+        padding-left: 0;
+      }
+      #list-item {
+        display: flex;
+        flex-wrap: wrap;
+        cursor: pointer;
+        align-items: center;
+        border-style: solid;
+        border-width: 1px;
+        border-color: #f0f8ff;
+        border-radius: 5px;
+        font-size: 20px;
+        margin: 10px;
+        padding: 5px;
+        background-color: #d4e9ed;
+      }
+      .uploader {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 80px;
+        height: 30px;
+        cursor: pointer;
+        margin: 5px;
+        padding: 1px;
+        border-style: solid;
+        border-radius: 5px;
+        border-width: 1px;
+        border-color: #accfff;
+        background-color: white;
+        font-size: 15px;
+      }
+      .uploader:hover {
+        background-color: #b7b7e4;
+        color: white;
+      }
+      #replay-upload {
+        position: absolute;
+        width: 0;
+        height: 0;
+        padding: 0;
+        overflow: hidden;
+        border: 0;
+      }
+      .header {
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+      }
+      .upload-button {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 80px;
+        height: 33px;
+        margin: 5px;
+        padding: 1px;
+        cursor: pointer;
+        border-style: solid;
+        border-radius: 5px;
+        border-width: 1px;
+        border-color: #accfff;
+        font-size: 15px;
+        background-color: white;
+      }
+      .upload-button:hover {
+        border-style: none;
+        background-color: #b7b7e4;
+        color: white;
+      }
+      .file-text {
+        margin: 0;
+        padding: 0;
+      }
+    </style>
   </head>
   <body>
+    <div class="logo">
+      <img src="https://i.imgur.com/RHi1T2Q.png" />
+    </div>
     <form>
-      <input type="file" id="replay-upload" name="replay-upload" multiple />
-      <button type="button" onclick="upload()">업로드</button>
+      <div class="header">
+        <input
+          type="file"
+          id="replay-upload"
+          name="replay-upload"
+          onchange="stateUpdate(this)"
+        />
+        <label for="replay-upload">
+          <div class="uploader"><p class="file-text">SELECT</p></div>
+        </label>
+        <button class="upload-button" type="button" onclick="upload()">
+          <p class="file-text">
+            <i class="fa-solid fa-arrow-up-from-bracket"></i>
+          </p>
+        </button>
+      </div>
     </form>
     <ul id="list"></ul>
     <script>
@@ -17,11 +131,11 @@
         method: 'get',
         url: '/get_list',
       }).then((res) => {
-        console.log(res);
-        let list = res.data.data;
+        let list = res.data.data.reverse();
         let ul = document.querySelector('#list');
         for (let i = 0; i < list.length; i++) {
           let li = document.createElement('li');
+          li.id = 'list-item';
           let title = list[i].fileName;
           li.innerText = list[i].title;
           li.onclick = async () => {
@@ -39,8 +153,37 @@
           ul.append(li);
         }
       });
+      const stateUpdate = (files) => {
+        if (files.files[0].type !== 'text/html') {
+          alert('리플레이 파일만 올릴 수 있습니다');
+          $('#replay-upload').val('');
+        }
+        const READER = new FileReader();
+        READER.readAsText(files.files[0], 'EUC-KR');
+        let str = '';
+        READER.onload = function (e) {
+          str = e.target.result;
+          if (
+            str.includes(
+              'html,body {font-family:Verdana, sans-serif;font-size:10pt;margin:0;padding:0;}body{padding:12px 0;} .battle-log {font-family:Verdana, sans-serif;font-size:10pt;} .battle-log-inline {border:1px solid #AAAAAA;background:#EEF2F5;color:black;max-width:640px;margin:0 auto 80px;padding-bottom:5px;} .battle-log .inner {padding:4px 8px 0px 8px;} .battle-log .inner-preempt {padding:0 8px 4px 8px;} .battle-log .inner-after {margin-top:0.5em;} .battle-log h2 {margin:0.5em -8px;padding:4px 8px;border:1px solid #AAAAAA;background:#E0E7EA;border-left:0;border-right:0;font-family:Verdana, sans-serif;font-size:13pt;} .battle-log .chat {vertical-',
+            )
+          ) {
+            if (files.files.length > 0) {
+              document.querySelector('.upload-button').style.cssText = `
+            background-color : orange;
+            color: white;
+            border-color: yellow;
+          `;
+            }
+          } else {
+            alert('리플레이 파일만 올릴 수 있습니다');
+            $('#replay-upload').val('');
+          }
+        };
+      };
       const upload = async () => {
         const file = document.querySelector('#replay-upload');
+        console.log(file.files[0]);
         if (file.files.length == 0) {
           alert('파일을 선택해주세요');
           return;
@@ -61,6 +204,7 @@
           console.log(res.data);
           for (let i = 0; i < res.data.dataName.length; i++) {
             let li = document.createElement('li');
+            li.id = 'list-item';
             let title = res.data.open[i];
             li.innerText = res.data.dataName[i];
             li.onclick = async () => {
