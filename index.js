@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const PORT = 8000;
 const db = require('./models');
+require('dotenv').config();
 
 const http = require('http');
 const session = require('express-session');

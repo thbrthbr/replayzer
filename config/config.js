@@ -19,3 +19,5 @@ const production = {
   host: 'kdt-lecture-test.c0m1fdifsbpq.us-east-2.rds.amazonaws.com',
   dialect: 'mysql',
 };
+
+module.exports = { production };
