@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <title>REPLAYZER</title>
+  </head>
+  <body>
+    <form>
+      <input type="file" id="replay-upload" name="replay-upload" multiple />
+      <button type="button" onclick="upload()">업로드</button>
+    </form>
+    <ul id="list"></ul>
+    <script>
+      axios({
+        method: 'get',
+        url: '/get_list',
+      }).then((res) => {
+        console.log(res);
+        let list = res.data.data;
+        let ul = document.querySelector('#list');
+        for (let i = 0; i < list.length; i++) {
+          let li = document.createElement('li');
+          let title = list[i].fileName;
+          li.innerText = list[i].title;
+          li.onclick = async () => {
+            let res = await axios({
+              method: 'post',
+              url: '/select',
+              data: { data: title },
+            });
+            if (res.data == '성공') {
+              window.location.href = '/open';
+            } else {
+              alert('이동실패');
+            }
+          };
+          ul.append(li);
+        }
+      });
+      const upload = async () => {
+        const file = document.querySelector('#replay-upload');
+        if (file.files.length == 0) {
+          alert('파일을 선택해주세요');
+          return;
+        }
+        const formData = new FormData();
+        for (let i = 0; i < file.files.length; i++) {
+          formData.append('replay-upload', file.files[i]);
+        }
+        let res = await axios({
+          method: 'post',
+          url: '/replay_upload',
+          data: formData,
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+        if (res.data.status == '성공') {
+          console.log(res.data);
+          for (let i = 0; i < res.data.dataName.length; i++) {
+            let li = document.createElement('li');
+            let title = res.data.open[i];
+            li.innerText = res.data.dataName[i];
+            li.onclick = async () => {
+              let res = await axios({
+                method: 'post',
+                url: '/select',
+                data: { data: title },
+              });
+              if (res.data == '성공') {
+                window.location.href = '/open';
+              } else {
+                alert('이동실패');
+              }
+            };
+            document.querySelector('#list').append(li);
+          }
+          alert('업로드 성공');
+        } else {
+          alert('업로드 실패');
+        }
+      };
+    </script>
+  </body>
+</html>

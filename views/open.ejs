@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <title>Document</title>
+    <style>
+      .box {
+        width: 100%;
+        height: 100%;
+      }
+      .cinema {
+        width: 1000px;
+        height: 1000px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>리플레이</h1>
+    <a href="/">뒤로</a>
+    <div class="box"><iframe class="cinema"></iframe></div>
+    <script>
+      axios({
+        method: 'get',
+        url: '/replay/load',
+      }).then((res) => {
+        console.log(res.data.data);
+        const cinema = document.querySelector('.cinema');
+        cinema.src = '/replayShow';
+      });
+    </script>
+  </body>
+</html>
