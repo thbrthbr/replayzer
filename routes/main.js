@@ -25,10 +25,13 @@ const upload = multer({ storage, limits });
 router.get('/get_list', Controller.getList);
 
 router.get('/', Controller.intro);
-router.post('/replay_upload', upload.array('replay-upload'), Controller.upload);
-router.post('/select', Controller.select);
-router.get('/replay/load', Controller.load);
-router.get('/open', Controller.show);
+// router.post('/replay_upload', upload.array('replay-upload'), Controller.upload);
+router.post(
+  '/replay_upload',
+  upload.single('replay-upload'),
+  Controller.upload,
+);
+router.get('/replay/:id', Controller.show);
 router.get('/replayShow', Controller.replayShow);
 router.post('/search', Controller.search);
 module.exports = router;

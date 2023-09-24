@@ -1,8 +1,6 @@
 const { List } = require('../models');
 const { Op } = require('sequelize');
 
-let dataQueue = ['0'];
-
 exports.intro = (req, res) => {
   res.render('main');
 };
@@ -12,6 +10,7 @@ exports.getList = async (req, res) => {
   let arr = [];
   for (let i = 0; i < list.length; i++) {
     let obj = {
+      fileid: list[i].dataValues.id,
       title: list[i].dataValues.title,
       fileName: list[i].dataValues.fileName,
     };
@@ -21,46 +20,33 @@ exports.getList = async (req, res) => {
 };
 
 exports.show = (req, res) => {
-  res.render('open');
-};
-
-exports.select = (req, res) => {
-  try {
-    dataQueue.shift();
-    dataQueue.push(req.body.data);
-    res.send('성공');
-  } catch (e) {
-    res.send('실패');
-  }
+  req.session.which = req.params;
+  res.render('replay');
 };
 
 exports.upload = async (req, res) => {
   try {
-    let arr = [];
-    let openArr = [];
-    for (let i = 0; i < req.files.length; i++) {
-      let name = req.files[i].originalname.split('.')[0];
-      arr.push(name);
-      openArr.push(req.files[i].filename);
-      let response = await List.create({
-        title: name,
-        fileName: req.files[i].filename,
-      });
-    }
-    res.send({ status: '성공', dataName: arr, open: openArr });
+    let response = await List.create({
+      title: req.body.title,
+      fileName: req.file.filename,
+    });
+    let fileId = response.dataValues.id;
+    res.send({
+      status: '성공',
+      dataName: req.body.title,
+      open: req.file.filename,
+      fileid: fileId,
+    });
   } catch (e) {
     console.log('error: ', e);
     res.send({ status: '실패' });
   }
 };
 
-exports.load = (req, res) => {
-  res.send({ data: dataQueue[0] });
-};
-
-exports.replayShow = (req, res) => {
-  console.log(req.params);
-  res.render(dataQueue[0]);
+exports.replayShow = async (req, res) => {
+  let numbering = parseInt(req.session.which.id);
+  let response = await List.findOne({ where: { id: numbering } });
+  res.render(response.fileName);
 };
 
 exports.search = async (req, res) => {
@@ -70,6 +56,7 @@ exports.search = async (req, res) => {
     for (let i = 0; i < result.length; i++) {
       if (result[i].dataValues.title.includes(req.body.keyword)) {
         let obj = {
+          fileid: result[i].dataValues.id,
           title: result[i].dataValues.title,
           fileName: result[i].dataValues.fileName,
         };
@@ -78,6 +65,6 @@ exports.search = async (req, res) => {
     }
     res.send({ status: '성공', data: arr });
   } catch (e) {
-    ㄱes.send({ status: '실패' });
+    res.send({ status: '실패' });
   }
 };

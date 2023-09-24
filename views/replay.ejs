@@ -33,16 +33,9 @@
             style="width: 120px; height: 100px"
           />
         </a>
-      <div class="box"><iframe class="cinema"></iframe></div>
+      <div class="box"><iframe src='/replayShow' class="cinema"></iframe></div>
     </div>
     <script>
-      axios({
-        method: 'get',
-        url: '/replay/load',
-      }).then((res) => {
-        const cinema = document.querySelector('.cinema');
-        cinema.src = '/replayShow';
-      });
     </script>
   </body>
 </html>

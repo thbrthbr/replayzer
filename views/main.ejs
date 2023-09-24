@@ -156,19 +156,11 @@
         for (let i = 0; i < list.length; i++) {
           let li = document.createElement('li');
           li.id = 'list-item';
-          let title = list[i].fileName;
-          li.innerText = list[i].title;
-          li.onclick = async () => {
-            let res = await axios({
-              method: 'post',
-              url: '/select',
-              data: { data: title },
-            });
-            if (res.data == '성공') {
-              window.location.href = '/open';
-            } else {
-              alert('이동실패');
-            }
+          let fileid = list[i].fileid;
+          let title = list[i].title.replace('_', ' ');
+          li.innerText = title;
+          li.onclick = () => {
+            window.location.href = `/replay/${fileid}`;
           };
           ul.append(li);
         }
@@ -207,55 +199,59 @@
           alert('파일을 선택해주세요');
           return;
         }
-        const formData = new FormData();
-        for (let i = 0; i < file.files.length; i++) {
-          formData.append('replay-upload', file.files[i]);
+        let prompt = window.prompt('업로드할 리플레이의 제목을 작성해주세요');
+        if (prompt == null) {
+          return;
         }
-        let res = await axios({
-          method: 'post',
-          url: '/replay_upload',
-          data: formData,
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
-        if (res.data.status == '성공') {
-          for (let i = 0; i < res.data.dataName.length; i++) {
+        if (prompt.length > 0) {
+          if (prompt.length > 100) {
+            alert('제목은 100글자 아래로 설정해주세요');
+            return;
+          }
+          prompt = prompt.replace(' ', '_');
+          const formData = new FormData();
+          formData.append('title', prompt);
+          formData.append('replay-upload', file.files[0]);
+          let res = await axios({
+            method: 'post',
+            url: '/replay_upload',
+            data: formData,
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          });
+          if (res.data.status == '성공') {
             let li = document.createElement('li');
             li.id = 'list-item';
-            let title = res.data.open[i];
-            li.innerText = res.data.dataName[i];
-            li.onclick = async () => {
-              let res = await axios({
-                method: 'post',
-                url: '/select',
-                data: { data: title },
-              });
-              if (res.data == '성공') {
-                window.location.href = '/open';
-              } else {
-                alert('이동실패');
-              }
+            let fileid = res.data.fileid;
+            let title = res.data.dataName.replace('_', ' ');
+            li.innerText = title;
+            li.onclick = () => {
+              window.location.href = `/replay/${fileid}`;
             };
             document
               .querySelector('#list')
               .insertBefore(li, document.querySelector('#list').firstChild);
-          }
-          $('#replay-upload').val('');
-          document.querySelector('.upload-button').style.cssText = `
+            $('#replay-upload').val('');
+            document.querySelector('.upload-button').style.cssText = `
             border-color: #accfff;
             color: black;
             background-color: white;
           `;
 
-          alert('업로드 성공');
+            alert('업로드 성공');
+          } else {
+            alert('업로드 실패');
+          }
         } else {
-          alert('업로드 실패');
+          alert('제목은 한 글자 이상 적어주세요');
+          upload();
         }
       };
 
       const search = async () => {
         let keyword = document.querySelector('.search-input').value;
+        keyword = keyword.replace(' ', '_');
         let res = await axios({
           method: 'post',
           url: '/search',
@@ -268,19 +264,11 @@
           for (let i = 0; i < list.length; i++) {
             let li = document.createElement('li');
             li.id = 'list-item';
-            let title = list[i].fileName;
-            li.innerText = list[i].title;
-            li.onclick = async () => {
-              let res = await axios({
-                method: 'post',
-                url: '/select',
-                data: { data: title },
-              });
-              if (res.data == '성공') {
-                window.location.href = '/open';
-              } else {
-                alert('이동실패');
-              }
+            let fileid = list[i].fileid;
+            let title = list[i].title.replace('_', ' ');
+            li.innerText = title;
+            li.onclick = () => {
+              window.location.href = `/replay/${fileid}`;
             };
             ul.append(li);
           }
