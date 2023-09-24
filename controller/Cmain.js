@@ -1,5 +1,6 @@
 const { List } = require('../models');
 const { Op } = require('sequelize');
+const fs = require('fs');
 
 exports.intro = (req, res) => {
   res.render('main');
@@ -46,7 +47,25 @@ exports.upload = async (req, res) => {
 exports.replayShow = async (req, res) => {
   let numbering = parseInt(req.session.which.id);
   let response = await List.findOne({ where: { id: numbering } });
-  res.render(response.fileName);
+  if (response) {
+    const tDir = __dirname + '/../views/';
+    let flag = 0;
+    fs.readdir(tDir, (err, data) => {
+      if (err) throw err;
+      data.forEach((item, i) => {
+        if (item == response.fileName) {
+          flag++;
+        }
+      });
+      if (flag !== 0) {
+        res.render(response.fileName);
+      } else {
+        res.render('404_2');
+      }
+    });
+  } else {
+    res.render('404_2');
+  }
 };
 
 exports.search = async (req, res) => {
