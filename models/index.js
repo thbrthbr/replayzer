@@ -15,6 +15,7 @@ const sequelize = new Sequelize(
 
 //모델
 db.List = require('./List')(sequelize);
+db.Comment = require('./Comment')(sequelize);
 
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;

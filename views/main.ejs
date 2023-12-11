@@ -146,25 +146,35 @@
       </button>
     </div>
     <ul id="list"></ul>
+    <div id="loader" style="text-align: center; color: white">load more</div>
     <script>
-      axios({
-        method: 'get',
-        url: '/get_list',
-      }).then((res) => {
-        let list = res.data.data.reverse();
-        let ul = document.querySelector('#list');
-        for (let i = 0; i < list.length; i++) {
-          let li = document.createElement('li');
-          li.id = 'list-item';
-          let fileid = list[i].fileid;
-          let title = list[i].title.replace('_', ' ');
-          li.innerText = title;
-          li.onclick = () => {
-            window.location.href = `/replay/${fileid}`;
-          };
-          ul.append(li);
-        }
+      let count = 1;
+      let observer = new IntersectionObserver(async () => {
+        setTimeout(() => {
+          axios({
+            method: 'get',
+            url: `/get_list/${count}`,
+          }).then((res) => {
+            let list = res.data.data;
+            let ul = document.querySelector('#list');
+            for (let i = 0; i < list.length; i++) {
+              let li = document.createElement('li');
+              li.id = 'list-item';
+              let fileid = list[i].fileid;
+              let title = list[i].title.replace('_', ' ');
+              li.innerText = title;
+              li.onclick = () => {
+                window.location.href = `/replay/${fileid}`;
+              };
+              ul.append(li);
+            }
+            count++;
+          });
+        }, 1000);
       });
+      let loader = document.querySelector('#loader');
+      observer.observe(loader);
+
       const stateUpdate = (files) => {
         if (files.files[0].type !== 'text/html') {
           alert('리플레이 파일만 올릴 수 있습니다');
@@ -193,6 +203,7 @@
           }
         };
       };
+
       const upload = async () => {
         const file = document.querySelector('#replay-upload');
         if (file.files.length == 0) {

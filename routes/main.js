@@ -22,7 +22,7 @@ const limits = {
 };
 const upload = multer({ storage, limits });
 
-router.get('/get_list', Controller.getList);
+router.get('/get_list/:page', Controller.getList);
 
 router.get('/', Controller.intro);
 // router.post('/replay_upload', upload.array('replay-upload'), Controller.upload);
@@ -34,4 +34,8 @@ router.post(
 router.get('/replay/:id', Controller.show);
 router.get('/replayShow', Controller.replayShow);
 router.post('/search', Controller.search);
+
+router.get('/getComments/:pageid', Controller.getComments);
+router.post('/commentAdd', Controller.commentAdd);
+router.post('/commentSub', Controller.commentSub);
 module.exports = router;

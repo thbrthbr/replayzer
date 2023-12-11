@@ -1,4 +1,5 @@
 const { List } = require('../models');
+const { Comment } = require('../models');
 const { Op } = require('sequelize');
 const fs = require('fs');
 
@@ -7,15 +8,20 @@ exports.intro = (req, res) => {
 };
 
 exports.getList = async (req, res) => {
+  console.log(req.params.page);
+  let page = req.params.page;
   let list = await List.findAll();
+  list = list.reverse();
   let arr = [];
-  for (let i = 0; i < list.length; i++) {
-    let obj = {
-      fileid: list[i].dataValues.id,
-      title: list[i].dataValues.title,
-      fileName: list[i].dataValues.fileName,
-    };
-    arr.push(obj);
+  for (let i = (page - 1) * 10; i < page * 10; i++) {
+    if (list[i]) {
+      let obj = {
+        fileid: list[i].dataValues.id,
+        title: list[i].dataValues.title,
+        fileName: list[i].dataValues.fileName,
+      };
+      arr.push(obj);
+    }
   }
   res.send({ data: arr });
 };
@@ -86,4 +92,31 @@ exports.search = async (req, res) => {
   } catch (e) {
     res.send({ status: '실패' });
   }
+};
+
+exports.getComments = async (req, res) => {
+  let result = await Comment.findAll({ where: { pageid: +req.params.pageid } });
+  console.log(result);
+  res.send({ status: '성공', data: result });
+};
+
+exports.commentAdd = async (req, res) => {
+  try {
+    console.log(req.body);
+    let response = await Comment.create({
+      nick: req.body.nick,
+      pw: req.body.pw,
+      content: req.body.content,
+      pageid: req.body.pageid,
+    });
+    res.send({ status: '성공' });
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+exports.commentSub = async (req, res) => {
+  console.log(req.body);
+  let result = await Comment.destroy({ where: { id: req.body.commentId } });
+  res.send({ status: '성공' });
 };

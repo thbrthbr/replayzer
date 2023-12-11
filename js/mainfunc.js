@@ -16,6 +16,7 @@ axios({
     ul.append(li);
   }
 });
+
 const stateUpdate = (files) => {
   if (files.files[0].type !== 'text/html') {
     alert('리플레이 파일만 올릴 수 있습니다');
@@ -44,6 +45,7 @@ const stateUpdate = (files) => {
     }
   };
 };
+
 const upload = async () => {
   const file = document.querySelector('#replay-upload');
   if (file.files.length == 0) {
