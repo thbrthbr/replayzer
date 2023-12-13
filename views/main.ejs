@@ -29,6 +29,7 @@
       }
       #list-item {
         display: flex;
+        justify-content: space-between;
         flex-wrap: wrap;
         cursor: pointer;
         align-items: center;
@@ -142,35 +143,48 @@
       </button>
       <input class="search-input" type="text" />
       <button type="button" class="upload-button" onclick="search()">
-        SEARCH
+        <p class="file-text">SEARCH</p>
       </button>
     </div>
     <ul id="list"></ul>
-    <div id="loader" style="text-align: center; color: white">load more</div>
+    <div id="loader" style="text-align: center; color: #ffffff">load more</div>
     <script>
       let count = 1;
       let observer = new IntersectionObserver(async () => {
-        setTimeout(() => {
-          axios({
-            method: 'get',
-            url: `/get_list/${count}`,
-          }).then((res) => {
-            let list = res.data.data;
-            let ul = document.querySelector('#list');
-            for (let i = 0; i < list.length; i++) {
-              let li = document.createElement('li');
-              li.id = 'list-item';
-              let fileid = list[i].fileid;
-              let title = list[i].title.replace('_', ' ');
-              li.innerText = title;
-              li.onclick = () => {
-                window.location.href = `/replay/${fileid}`;
-              };
-              ul.append(li);
+        // setTimeout(() => {
+        axios({
+          method: 'get',
+          url: `/get_list/${count}`,
+        }).then((res) => {
+          let list = res.data.data;
+          let ul = document.querySelector('#list');
+          for (let i = 0; i < list.length; i++) {
+            let li = document.createElement('li');
+            li.id = 'list-item';
+            let fileid = list[i].fileid;
+
+            let titleArea = document.createElement('div');
+            let commentArea = document.createElement('div');
+            let title = list[i].title.replace('_', ' ');
+            titleArea.innerText = title;
+            let commentNum = list[i].commentNum;
+            if (commentNum !== 0) {
+              commentArea.style.cssText = `
+                color: #0066ff;
+                font-weight: 900;
+              `;
             }
-            count++;
-          });
-        }, 1000);
+            commentArea.innerText = '[' + commentNum + ']';
+            li.appendChild(titleArea);
+            li.appendChild(commentArea);
+            li.onclick = () => {
+              window.location.href = `/replay/${fileid}`;
+            };
+            ul.append(li);
+          }
+          count++;
+        });
+        // }, 1000);
       });
       let loader = document.querySelector('#loader');
       observer.observe(loader);
@@ -232,24 +246,25 @@
             },
           });
           if (res.data.status == '성공') {
-            let li = document.createElement('li');
-            li.id = 'list-item';
-            let fileid = res.data.fileid;
-            let title = res.data.dataName.replace('_', ' ');
-            li.innerText = title;
-            li.onclick = () => {
-              window.location.href = `/replay/${fileid}`;
-            };
-            document
-              .querySelector('#list')
-              .insertBefore(li, document.querySelector('#list').firstChild);
-            $('#replay-upload').val('');
-            document.querySelector('.upload-button').style.cssText = `
-              border-color: #accfff;
-              color: black;
-              background-color: white;
-              `;
+            // let li = document.createElement('li');
+            // li.id = 'list-item';
+            // let fileid = res.data.fileid;
+            // let title = res.data.dataName.replace('_', ' ');
+            // li.innerText = title;
+            // li.onclick = () => {
+            //   window.location.href = `/replay/${fileid}`;
+            // };
+            // document
+            //   .querySelector('#list')
+            //   .insertBefore(li, document.querySelector('#list').firstChild);
+            // $('#replay-upload').val('');
+            // document.querySelector('.upload-button').style.cssText = `
+            //   border-color: #accfff;
+            //   color: black;
+            //   background-color: white;
+            //   `;
             alert('업로드 성공');
+            window.location.reload();
           } else {
             alert('업로드 실패');
           }

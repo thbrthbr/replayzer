@@ -11,18 +11,27 @@ exports.getList = async (req, res) => {
   console.log(req.params.page);
   let page = req.params.page;
   let list = await List.findAll();
+  let comments = await Comment.findAll();
   list = list.reverse();
   let arr = [];
   for (let i = (page - 1) * 10; i < page * 10; i++) {
     if (list[i]) {
+      let commentNum = 0;
+      for (let j = 0; j < comments.length; j++) {
+        if (list[i].dataValues.id == comments[j].dataValues.pageid) {
+          commentNum++;
+        }
+      }
       let obj = {
         fileid: list[i].dataValues.id,
         title: list[i].dataValues.title,
         fileName: list[i].dataValues.fileName,
+        commentNum: commentNum,
       };
       arr.push(obj);
     }
   }
+
   res.send({ data: arr });
 };
 

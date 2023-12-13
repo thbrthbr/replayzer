@@ -16,6 +16,8 @@
       }
       .box {
         width: 100%;
+        max-height: 500px;
+        overflow: hidden;
       }
       .cinema {
         width: 100%;
@@ -59,6 +61,20 @@
       #content:focus{
         outline:none;
       }
+
+      #comment-button{
+        width:20%;
+        background-color: white;
+        cursor: pointer;
+        border-radius: 5px;
+      }
+      #comment-button:hover{
+        color: white;
+        background-color: #d4e9ed;
+      }
+      .font-sizer {
+        font-size : 50px;
+      }
     </style>
   </head>
   <body>
@@ -75,13 +91,13 @@
     <br/>
     <div><h1 id="commentNum" style="color: white">댓글</h1></div>
     <ul style="margin: 0px; padding: 0px; list-style: none" id="commentList"></ul>
-    <div style="width: 50%">
+    <div style="width: 100%; margin-top: 20px; padding: 5px">
       <div style="width: 100%; display: flex; justify-content: space-between;" class="inputWrapper">
-        <input id="nick" style="width:40%" placeholder="닉네임" type="text">
-        <input id="pw" style="width:40%" placeholder="****" type="password">
-        <button onclick="comment()" style="width:20%">작성</button>
+        <input class="font-sizer" id="nick" style="width:40%" placeholder="닉네임" type="text">
+        <input class="font-sizer" id="pw" style="width:40%" placeholder="****" type="password">
+        <button class="font-sizer" id="comment-button" onclick="comment()">등록</button>
       </div>
-      <textarea id="content"></textarea>
+      <textarea class="font-sizer" style="min-height: 120px;" id="content"></textarea>
     </div>
     <script>
 
@@ -103,11 +119,17 @@
           dateLine.id = "dateLine";
           deleter.id = "deleter";
           let contentLine = document.createElement("div");
+          contentLine.style.cssText = `
+            padding: 5px;
+          `
           nickLine.innerText = res.data.data[i].nick;
           contentLine.innerText = res.data.data[i].content;
           let timeFixer = +res.data.data[i].createdAt.slice(11, 13);
           timeFixer = "" + ((timeFixer+9) % 24);
           if(timeFixer.length == 1) timeFixer = "0" + timeFixer;
+          dateLine.style.cssText = `
+            padding: 7px;
+          `
           dateLine.innerText = res.data.data[i].createdAt.slice(0, 10) + " " + timeFixer + res.data.data[i].createdAt.slice(13, 16) + " ";
           deleter.innerText = "삭제";
           deleter.onclick = () => {
@@ -120,7 +142,9 @@
           li.appendChild(box);
           li.id = "eachComment";
           commentList.appendChild(li);
-          commentList.appendChild(liner);
+          if(i < res.data.data.length - 1){
+            commentList.appendChild(liner);
+          }
         }
       })
 
