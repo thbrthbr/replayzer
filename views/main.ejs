@@ -142,48 +142,64 @@
         <i class="fa-solid fa-arrows-rotate"></i>
       </button>
       <input class="search-input" type="text" />
-      <button type="button" class="upload-button" onclick="search()">
+      <button
+        type="button"
+        class="upload-button"
+        onclick="searchAfterCountReset()"
+      >
         <p class="file-text">SEARCH</p>
       </button>
     </div>
     <ul id="list"></ul>
-    <div id="loader" style="text-align: center; color: #ffffff">load more</div>
+    <div id="loader" style="text-align: center; color: #ffffff">Load...</div>
     <script>
       let count = 1;
+      let searchKeyword = '';
+      let searchPage = 1;
       let observer = new IntersectionObserver(async () => {
         // setTimeout(() => {
-        axios({
-          method: 'get',
-          url: `/get_list/${count}`,
-        }).then((res) => {
-          let list = res.data.data;
-          let ul = document.querySelector('#list');
-          for (let i = 0; i < list.length; i++) {
-            let li = document.createElement('li');
-            li.id = 'list-item';
-            let fileid = list[i].fileid;
-
-            let titleArea = document.createElement('div');
-            let commentArea = document.createElement('div');
-            let title = list[i].title.replace('_', ' ');
-            titleArea.innerText = title;
-            let commentNum = list[i].commentNum;
-            if (commentNum !== 0) {
-              commentArea.style.cssText = `
+        if (!searchKeyword) {
+          axios({
+            method: 'get',
+            url: `/get_list/${count}`,
+          }).then((res) => {
+            let list = res.data.data;
+            if (list.length > 0) {
+              let ul = document.querySelector('#list');
+              for (let i = 0; i < list.length; i++) {
+                let li = document.createElement('li');
+                li.id = 'list-item';
+                let fileid = list[i].fileid;
+                let titleArea = document.createElement('div');
+                let commentArea = document.createElement('div');
+                let title = list[i].title.replace('_', ' ');
+                titleArea.innerText = title;
+                let commentNum = list[i].commentNum;
+                if (commentNum !== 0) {
+                  commentArea.style.cssText = `
                 color: #0066ff;
                 font-weight: 900;
               `;
+                }
+                commentArea.innerText = '[' + commentNum + ']';
+                li.appendChild(titleArea);
+                li.appendChild(commentArea);
+                li.onclick = () => {
+                  window.location.href = `/replay/${fileid}`;
+                };
+                ul.append(li);
+              }
+              count++;
+            } else {
+              let loader = document.querySelector('#loader');
+              loader.innerText = 'No more data';
             }
-            commentArea.innerText = '[' + commentNum + ']';
-            li.appendChild(titleArea);
-            li.appendChild(commentArea);
-            li.onclick = () => {
-              window.location.href = `/replay/${fileid}`;
-            };
-            ul.append(li);
-          }
-          count++;
-        });
+          });
+        } else {
+          searchPage++;
+          search();
+        }
+
         // }, 1000);
       });
       let loader = document.querySelector('#loader');
@@ -274,31 +290,56 @@
         }
       };
 
+      const searchAfterCountReset = () => {
+        let loader = document.querySelector('#loader');
+        loader.innerText = 'Load...';
+        searchPage = 1;
+        search();
+      };
+
       const search = async () => {
         let keyword = document.querySelector('.search-input').value;
         keyword = keyword.replace(' ', '_');
+        searchKeyword = keyword;
         let res = await axios({
           method: 'post',
           url: '/search',
-          data: { keyword: keyword },
+          data: { keyword: keyword, page: searchPage },
         });
         if (res.data.status == '성공') {
-          let list = res.data.data.reverse();
-          let ul = document.querySelector('#list');
-          ul.innerHTML = '';
-          for (let i = 0; i < list.length; i++) {
-            let li = document.createElement('li');
-            li.id = 'list-item';
-            let fileid = list[i].fileid;
-            let title = list[i].title.replace('_', ' ');
-            li.innerText = title;
-            li.onclick = () => {
-              window.location.href = `/replay/${fileid}`;
-            };
-            ul.append(li);
+          let list = res.data.data;
+          if (list.length > 0) {
+            let ul = document.querySelector('#list');
+            if (searchPage == 1) {
+              ul.innerHTML = '';
+            }
+            for (let i = 0; i < list.length; i++) {
+              let li = document.createElement('li');
+              li.id = 'list-item';
+              let fileid = list[i].fileid;
+              let titleArea = document.createElement('div');
+              let commentArea = document.createElement('div');
+              let title = list[i].title.replace('_', ' ');
+              li.innerText = title;
+              let commentNum = list[i].commentNum;
+              if (commentNum !== 0) {
+                commentArea.style.cssText = `
+                color: #0066ff;
+                font-weight: 900;
+              `;
+              }
+              commentArea.innerText = '[' + commentNum + ']';
+              li.appendChild(titleArea);
+              li.appendChild(commentArea);
+              li.onclick = () => {
+                window.location.href = `/replay/${fileid}`;
+              };
+              ul.append(li);
+            }
+          } else {
+            let loader = document.querySelector('#loader');
+            loader.innerText = 'No more data';
           }
-        } else {
-          alert('데이터를 불러오지 못했습니다');
         }
       };
 

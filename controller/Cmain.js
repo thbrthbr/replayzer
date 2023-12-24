@@ -8,7 +8,6 @@ exports.intro = (req, res) => {
 };
 
 exports.getList = async (req, res) => {
-  console.log(req.params.page);
   let page = req.params.page;
   let list = await List.findAll();
   let comments = await Comment.findAll();
@@ -85,16 +84,34 @@ exports.replayShow = async (req, res) => {
 
 exports.search = async (req, res) => {
   try {
-    let result = await List.findAll();
+    let result = await List.findAll({
+      where: {
+        title: {
+          [Op.like]: '%' + req.body.keyword + '%',
+        },
+      },
+    });
+    result = result.reverse();
+    let comments = await Comment.findAll();
     let arr = [];
-    for (let i = 0; i < result.length; i++) {
-      if (result[i].dataValues.title.includes(req.body.keyword)) {
+    let page = req.body.page;
+    for (let i = (page - 1) * 10; i < page * 10; i++) {
+      if (result[i]) {
+        let commentNum = 0;
+        for (let j = 0; j < comments.length; j++) {
+          if (result[i].dataValues.id == comments[j].dataValues.pageid) {
+            commentNum++;
+          }
+        }
         let obj = {
           fileid: result[i].dataValues.id,
           title: result[i].dataValues.title,
           fileName: result[i].dataValues.fileName,
+          commentNum: commentNum,
         };
         arr.push(obj);
+      } else {
+        break;
       }
     }
     res.send({ status: '성공', data: arr });
