@@ -116,7 +116,7 @@
     </style>
   </head>
   <body>
-    <div class="logo">
+    <div class="logo" onclick="refresh()">
       <img src="https://i.imgur.com/RHi1T2Q.png" />
     </div>
     <form>
@@ -141,7 +141,7 @@
       <button class="upload-button" onclick="refresh()">
         <i class="fa-solid fa-arrows-rotate"></i>
       </button>
-      <input class="search-input" type="text" />
+      <input class="search-input" type="text" onkeyup="enterHandler(this)" />
       <button
         type="button"
         class="upload-button"
@@ -287,6 +287,12 @@
         } else {
           alert('제목은 한 글자 이상 적어주세요');
           upload();
+        }
+      };
+
+      const enterHandler = () => {
+        if (window.event.keyCode == 13) {
+          searchAfterCountReset();
         }
       };
 
