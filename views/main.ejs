@@ -350,6 +350,9 @@
               ul.append(li);
             }
           } else {
+            if (searchPage == 1) {
+              ul.innerHTML = '';
+            }
             let loader = document.querySelector('#loader');
             loader.innerText = 'No more data';
           }
