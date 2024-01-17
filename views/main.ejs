@@ -17,6 +17,7 @@
     <style>
       body {
         background-color: #1e1424;
+        position: relative;
       }
       .logo {
         width: 100%;
@@ -103,6 +104,44 @@
         background-color: #b7b7e4;
         color: white;
       }
+      .cover {
+        position: absolute;
+        top: 0;
+        /* width: 90vw; */
+        width: 100vw;
+        height: 100%;
+        padding: 8px;
+        border-radius: 5px;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 2;
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        /* justify-content: center; */
+      }
+      .upload-section {
+        top: 100px;
+        width: 90vw;
+        height: 50vh;
+        background-color: white;
+        border-radius: 5px;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        display: flex;
+        padding: 8px;
+        position: relative;
+        /* 
+        background-color: white; */
+      }
+      .section-top-area {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        width: 100%;
+        display: flex;
+        justify-content: end;
+      }
       .file-text {
         margin: 0;
         padding: 0;
@@ -128,7 +167,59 @@
     </div>
     <form>
       <div class="header">
-        <input
+        <!-- <button onclick="temp4()">도니</button> -->
+        <button type="button" class="upload-button" onclick="sectionHandler()">
+          <p class="file-text">
+            <i class="fa-solid fa-arrow-up-from-bracket"></i>
+          </p>
+        </button>
+        <div class="cover" onclick="sectionHandler()">
+          <div class="upload-section">
+            <div class="section-top-area">
+              <i
+                class="fa-solid fa-xmark"
+                style="cursor: pointer"
+                onclick="sectionHandler()"
+              ></i>
+            </div>
+            <input
+              type="file"
+              id="replay-upload"
+              name="replay-upload"
+              onchange="stateUpdate(this)"
+            />
+            <label for="replay-upload">
+              <div class="uploader"><p class="file-text">SELECT</p></div>
+            </label>
+            <br />
+            <div>파일이름</div>
+            <input id="filename" type="text" />
+            <br />
+            <div>비밀번호 설정</div>
+            <div>(주의: 미설정시 랜덤값 지정)</div>
+            <input id="filepassword" type="password" />
+            <br />
+            잠금 설정
+            <div>
+              <span
+                >공개<input name="private" value="true" type="radio" checked
+              /></span>
+              <span
+                >비공개<input name="private" value="false" type="radio"
+              /></span>
+            </div>
+            <br />
+            <button
+              id="upload-button"
+              class="upload-button"
+              type="button"
+              onclick="upload2()"
+            >
+              <p class="file-text">UPLOAD</p>
+            </button>
+          </div>
+        </div>
+        <!-- <input
           type="file"
           id="replay-upload"
           name="replay-upload"
@@ -141,7 +232,7 @@
           <p class="file-text">
             <i class="fa-solid fa-arrow-up-from-bracket"></i>
           </p>
-        </button>
+        </button> -->
       </div>
     </form>
     <div class="search-line">
@@ -160,6 +251,14 @@
     <ul id="list"></ul>
     <div id="loader" style="text-align: center; color: #ffffff">Load...</div>
     <script>
+      // const temp4 = async () => {
+      //   await axios({
+      //     method: 'post',
+      //     url: '/temp',
+      //     data: [],
+      //   });
+      // };
+
       let count = 1;
       let searchKeyword = '';
       let searchPage = 1;
@@ -181,18 +280,59 @@
                 let commentArea = document.createElement('div');
                 let title = list[i].title.replace('_', ' ');
                 titleArea.innerText = title;
+                titleArea.style.cssText = `
+                  max-width: 260px;
+                  overflow: hidden;
+                  white-space: nowrap;
+                  text-overflow: ellipsis;
+                  word-break: break-all;
+                `;
                 let commentNum = list[i].commentNum;
-                if (commentNum !== 0) {
+                if (commentNum !== 0 && list[i].locked == 'true') {
                   commentArea.style.cssText = `
                 color: #0066ff;
                 font-weight: 900;
               `;
                 }
-                commentArea.innerText = '[' + commentNum + ']';
+                if (list[i].locked == 'true') {
+                  //공개일때
+                  commentArea.innerHTML = `[${commentNum}] &nbsp`;
+                  let deleter = document.createElement('i');
+                  deleter.classList.add('fa-solid');
+                  deleter.classList.add('fa-xmark');
+                  deleter.onclick = (e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    replayDeleter(list[i].filePassword, list[i].fileid);
+                  };
+                  commentArea.appendChild(deleter);
+                } else {
+                  //비공개일때
+                  let locker = document.createElement('span');
+                  locker.innerHTML = `<i class="fa-solid fa-lock"></i> &nbsp`;
+                  let deleter = document.createElement('i');
+                  deleter.classList.add('fa-solid');
+                  deleter.classList.add('fa-xmark');
+                  deleter.onclick = (e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    replayDeleter(list[i].filePassword, list[i].fileid);
+                  };
+                  locker.appendChild(deleter);
+                  commentArea.appendChild(locker);
+                }
                 li.appendChild(titleArea);
                 li.appendChild(commentArea);
                 li.onclick = () => {
-                  window.location.href = `/replay/${fileid}`;
+                  if (list[i].locked == 'true') {
+                    window.location.href = `/replay/${fileid}`;
+                  } else {
+                    let prompt =
+                      window.prompt('입장 : 비밀번호를 입력해주세요');
+                    if (prompt == list[i].filePassword) {
+                      window.location.href = `/replay/${list[i].privateURL}`;
+                    }
+                  }
                 };
                 ul.append(li);
               }
@@ -228,7 +368,7 @@
             )
           ) {
             if (files.files.length > 0) {
-              document.querySelector('.upload-button').style.cssText = `
+              document.querySelector('#upload-button').style.cssText = `
                 background-color : orange;
                 color: white;
                 border-color: yellow;
@@ -269,23 +409,6 @@
             },
           });
           if (res.data.status == '성공') {
-            // let li = document.createElement('li');
-            // li.id = 'list-item';
-            // let fileid = res.data.fileid;
-            // let title = res.data.dataName.replace('_', ' ');
-            // li.innerText = title;
-            // li.onclick = () => {
-            //   window.location.href = `/replay/${fileid}`;
-            // };
-            // document
-            //   .querySelector('#list')
-            //   .insertBefore(li, document.querySelector('#list').firstChild);
-            // $('#replay-upload').val('');
-            // document.querySelector('.upload-button').style.cssText = `
-            //   border-color: #accfff;
-            //   color: black;
-            //   background-color: white;
-            //   `;
             alert('업로드 성공');
             window.location.reload();
           } else {
@@ -295,6 +418,147 @@
           alert('제목은 한 글자 이상 적어주세요');
           upload();
         }
+      };
+
+      const upload2 = async () => {
+        const file = document.querySelector('#replay-upload');
+        if (file.files.length == 0) {
+          alert('파일을 선택해주세요');
+          return;
+        }
+        let isname = document.querySelector('#filename');
+        if (isname.value.length <= 0) {
+          alert('파일이름을 설정해주세요');
+          return;
+        }
+        if (isname.value.length > 100) {
+          alert('제목은 100글자 아래로 설정해주세요');
+          return;
+        }
+        let nameConfirmed = isname.value.replace(' ', '_');
+        let pwConfirmed = document.querySelector('#filepassword').value;
+        let initPW = pwConfirmed;
+        if (pwConfirmed.length <= 0) {
+          pwConfirmed = pwGenerator();
+        }
+        var chk_radio = document.getElementsByName('private');
+        var sel_type;
+        for (var i = 0; i < chk_radio.length; i++) {
+          if (chk_radio[i].checked == true) {
+            sel_type = chk_radio[i].value;
+          }
+        }
+        let myUrl = '';
+        if (sel_type == 'false') {
+          let tempUrl = pwGenerator();
+          while (tempUrl.length == 100) {
+            if (tempUrl.length < 100) {
+              tempUrl += pwGenerator();
+            }
+            if (tempUrl.length > 100) {
+              tempUrl = tempUrl.split('');
+              tempUrl.splice(0, 100);
+              tempUrl = tempUrl.join('');
+            }
+          }
+          myUrl = tempUrl + Date.now();
+        } else {
+          myUrl = 'none';
+        }
+        if (sel_type == 'false' && initPW.length <= 0) {
+          alert('비공개로 업로드시 비밀번호를 꼭 설정해주세요');
+          return;
+        }
+        const formData = new FormData();
+        formData.append('title', nameConfirmed);
+        formData.append('replay-upload', file.files[0]);
+        formData.append('password', pwConfirmed);
+        formData.append('locked', sel_type);
+        formData.append('privateURL', myUrl);
+        let res = await axios({
+          method: 'post',
+          url: '/replay_upload',
+          data: formData,
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+        if (res.data.status == '성공') {
+          alert('업로드 성공');
+          window.location.reload();
+        } else {
+          alert('업로드 실패');
+        }
+      };
+
+      const replayDeleter = async (pw, id) => {
+        let prompt = window.prompt('삭제 : 비밀번호를 입력해주세요');
+        if (prompt) {
+          if (prompt == pw) {
+            let res = await axios({
+              method: 'post',
+              url: '/replay_delete',
+              data: { id },
+            });
+            if (res.data.status == '성공') {
+              alert('리플레이가 삭제되었습니다');
+              window.location.reload();
+            } else {
+              alert('리플레이가 삭제 실패');
+            }
+          } else {
+            alert('비밀번호를 확인해주세요');
+          }
+        }
+      };
+
+      const pwGenerator = () => {
+        let pwConfirmed = '';
+        let tempPW = '' + Date.now();
+        console.log(tempPW);
+        let str = '';
+        let mix = [
+          'sd',
+          'Dw',
+          'poiuytfrds',
+          '1qw2ewr4fty6u7',
+          'wqe21',
+          'dczvghvz3',
+          'asdfghjk',
+          'zxcvbnm',
+          'd21e3',
+          '0we9fb203hedw',
+          '23ePlhd',
+          'POIUYTRDS',
+          'LKJHGVCX',
+          'NBVCXwdefPOIUYfewTR',
+          'pp1t',
+          'e',
+          '090xcv0hdj2',
+          '66plz',
+          'qedoo2',
+          'efoxcvejroc',
+          'E',
+          '213ed1e',
+          'we2ee34',
+          '20dExczvzcxvEeewjg',
+          '55DEw25fewdefwc',
+        ];
+        mix.sort(() => Math.random() - 0.5);
+        for (let i = 0; i < tempPW.length; i++) {
+          let each = mix[+tempPW[i]];
+          let tempEach = each.split('');
+          tempEach.sort(() => Math.random() - 0.5);
+          tempEach = tempEach.join('');
+          str += tempEach;
+        }
+        pwConfirmed = str;
+        if (pwConfirmed.length > 500) {
+          let temp = pwConfirmed.split('');
+          temp.splice(0, 499);
+          pwConfirmed = temp;
+        }
+        return pwConfirmed;
       };
 
       const enterHandler = () => {
@@ -359,6 +623,24 @@
           }
         }
       };
+
+      const sectionHandler = () => {
+        if (document.querySelector('.cover').style.display == 'flex') {
+          document.querySelector('.cover').style.display = 'none';
+          let body = document.getElementsByTagName('body')[0];
+          body.style.overflow = 'auto';
+        } else {
+          document.querySelector('.cover').style.display = 'flex';
+          let body = document.getElementsByTagName('body')[0];
+          body.style.overflow = 'hidden';
+        }
+      };
+
+      document
+        .querySelector('.upload-section')
+        .addEventListener('click', (e) => {
+          e.stopPropagation();
+        });
 
       const refresh = () => {
         window.location.reload();

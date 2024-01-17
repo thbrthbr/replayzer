@@ -31,6 +31,10 @@ router.post(
   upload.single('replay-upload'),
   Controller.upload,
 );
+router.post('/replay_delete', Controller.remove);
+
+// router.post('/temp', Controller.temp);
+
 router.get('/replay/:id', Controller.show);
 router.get('/replayShow', Controller.replayShow);
 router.post('/search', Controller.search);

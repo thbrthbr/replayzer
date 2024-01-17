@@ -1,4 +1,4 @@
-const { DataTypes } = require('sequelize');
+const { DataTypes, BOOLEAN } = require('sequelize');
 
 const List = (sequelize) => {
   const List = sequelize.define('list', {
@@ -14,6 +14,18 @@ const List = (sequelize) => {
     },
     fileName: {
       type: DataTypes.STRING(400),
+      allowNull: false,
+    },
+    filePassword: {
+      type: DataTypes.STRING(500),
+      allowNull: false,
+    },
+    privateURL: {
+      type: DataTypes.STRING(500),
+      allowNull: false,
+    },
+    locked: {
+      type: DataTypes.STRING(45),
       allowNull: false,
     },
   });

@@ -100,11 +100,11 @@
       <textarea class="font-sizer" style="min-height: 120px;" id="content"></textarea>
     </div>
     <script>
-
       axios({
         method: "get",
         url : `/getComments/${window.location.pathname.split("/")[2]}`
       }).then((res)=> {
+        console.log(res);
         let commentNum = document.querySelector("#commentNum");
         commentNum.innerText = commentNum.innerText + " " + res.data.data.length;
         let commentList = document.querySelector("#commentList");
@@ -160,7 +160,7 @@
               nick: nick.value ? nick.value : "ㅇㅇ", 
               pw : pw.value ? pw.value : "0000", 
               content: content.value,
-              pageid: +window.location.pathname.split("/")[2]
+              pageid: window.location.pathname.split("/")[2]
             }
           })
           if(res.data.status == "성공") window.location.reload();
