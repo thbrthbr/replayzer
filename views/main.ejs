@@ -598,19 +598,59 @@
               let titleArea = document.createElement('div');
               let commentArea = document.createElement('div');
               let title = list[i].title.replace('_', ' ');
-              li.innerText = title;
+              titleArea.innerText = title;
+              titleArea.style.cssText = `
+                  max-width: 260px;
+                  overflow: hidden;
+                  white-space: nowrap;
+                  text-overflow: ellipsis;
+                  word-break: break-all;
+                `;
               let commentNum = list[i].commentNum;
-              if (commentNum !== 0) {
+              if (commentNum !== 0 && list[i].locked == 'true') {
                 commentArea.style.cssText = `
                 color: #0066ff;
                 font-weight: 900;
               `;
               }
-              commentArea.innerText = '[' + commentNum + ']';
+              if (list[i].locked == 'true') {
+                //공개일때
+                commentArea.innerHTML = `[${commentNum}] &nbsp`;
+                let deleter = document.createElement('i');
+                deleter.classList.add('fa-solid');
+                deleter.classList.add('fa-xmark');
+                deleter.onclick = (e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                  replayDeleter(list[i].filePassword, list[i].fileid);
+                };
+                commentArea.appendChild(deleter);
+              } else {
+                //비공개일때
+                let locker = document.createElement('span');
+                locker.innerHTML = `<i class="fa-solid fa-lock"></i> &nbsp`;
+                let deleter = document.createElement('i');
+                deleter.classList.add('fa-solid');
+                deleter.classList.add('fa-xmark');
+                deleter.onclick = (e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                  replayDeleter(list[i].filePassword, list[i].fileid);
+                };
+                locker.appendChild(deleter);
+                commentArea.appendChild(locker);
+              }
               li.appendChild(titleArea);
               li.appendChild(commentArea);
               li.onclick = () => {
-                window.location.href = `/replay/${fileid}`;
+                if (list[i].locked == 'true') {
+                  window.location.href = `/replay/${fileid}`;
+                } else {
+                  let prompt = window.prompt('입장 : 비밀번호를 입력해주세요');
+                  if (prompt == list[i].filePassword) {
+                    window.location.href = `/replay/${list[i].privateURL}`;
+                  }
+                }
               };
               ul.append(li);
             }

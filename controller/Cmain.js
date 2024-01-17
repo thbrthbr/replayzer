@@ -197,6 +197,9 @@ exports.search = async (req, res) => {
           fileid: result[i].dataValues.id,
           title: result[i].dataValues.title,
           fileName: result[i].dataValues.fileName,
+          filePassword: result[i].dataValues.filePassword,
+          locked: result[i].dataValues.locked,
+          privateURL: result[i].dataValues.privateURL,
           commentNum: commentNum,
         };
         arr.push(obj);
