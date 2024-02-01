@@ -78,7 +78,7 @@
       .header {
         width: 100%;
         display: flex;
-        flex-direction: row;
+        flex-direction: column;
         justify-content: center;
         align-items: center;
       }
@@ -123,7 +123,7 @@
         top: 100px;
         width: 90vw;
         min-height: 320px;
-        height: 50vh;
+        height: 62vh;
         background-color: white;
         border-radius: 5px;
         flex-direction: column;
@@ -156,6 +156,19 @@
       .search-input {
         font-size: 20px;
       }
+      .warn {
+        font-size: 10px;
+        color: red;
+        display: none;
+        flex-direction: column;
+        justify-content: center;
+      }
+      .warn-item {
+        text-align: center;
+      }
+      .search-type {
+        color: white;
+      }
     </style>
   </head>
   <body>
@@ -174,6 +187,18 @@
             <i class="fa-solid fa-arrow-up-from-bracket"></i>
           </p>
         </button>
+        <div class="search-type">
+          <span
+            >TITLE SEARCH<input
+              name="search-type"
+              value="proper"
+              type="radio"
+              checked
+          /></span>
+          <span
+            >CODE SEARCH<input name="search-type" value="code" type="radio"
+          /></span>
+        </div>
         <div class="cover" onclick="sectionHandler()">
           <div class="upload-section">
             <div class="section-top-area">
@@ -203,11 +228,28 @@
             잠금 설정
             <div>
               <span
-                >공개<input name="private" value="true" type="radio" checked
+                >공개<input
+                  name="private"
+                  value="true"
+                  type="radio"
+                  checked
+                  onchange="checker(this)"
               /></span>
               <span
-                >비공개<input name="private" value="false" type="radio"
+                >비공개<input
+                  name="private"
+                  value="false"
+                  type="radio"
+                  onchange="checker(this)"
               /></span>
+            </div>
+            <div class="warn">
+              <div class="warn-item">비공개전환시 고유코드가 발급되며</div>
+              <div class="warn-item">고유코드로 검색시에만 노출됩니다</div>
+              <div class="warn-item">
+                비밀번호와 발급코드를 모두 저장해두세요
+              </div>
+              <div class="warn-item">(비밀번호: 삭제용 / 발급코드: 검색용)</div>
             </div>
             <br />
             <button
@@ -250,7 +292,13 @@
       </button>
     </div>
     <ul id="list"></ul>
-    <div id="loader" style="text-align: center; color: #ffffff">Load...</div>
+    <div
+      id="loader"
+      style="text-align: center; color: #ffffff; cursor: pointer"
+      onclick="loadLists()"
+    >
+      Load more
+    </div>
     <script>
       // const temp4 = async () => {
       //   await axios({
@@ -260,15 +308,14 @@
       //   });
       // };
 
-      let count = 1;
+      let count = 0;
       let searchKeyword = '';
-      let searchPage = 1;
-      let observer = new IntersectionObserver(async () => {
-        // setTimeout(() => {
+      let searchPage = 0;
+      const loadLists = async () => {
         if (!searchKeyword) {
           axios({
             method: 'get',
-            url: `/get_list/${count}`,
+            url: `/get_list/${++count}`,
           }).then((res) => {
             let list = res.data.data;
             if (list.length > 0) {
@@ -282,7 +329,7 @@
                 let title = list[i].title.replace('_', ' ');
                 titleArea.innerText = title;
                 titleArea.style.cssText = `
-                  max-width: 260px;
+                  max-width: 75%;
                   overflow: hidden;
                   white-space: nowrap;
                   text-overflow: ellipsis;
@@ -309,18 +356,19 @@
                   commentArea.appendChild(deleter);
                 } else {
                   //비공개일때
-                  let locker = document.createElement('span');
-                  locker.innerHTML = `<i class="fa-solid fa-lock"></i> &nbsp`;
-                  let deleter = document.createElement('i');
-                  deleter.classList.add('fa-solid');
-                  deleter.classList.add('fa-xmark');
-                  deleter.onclick = (e) => {
-                    e.stopPropagation();
-                    e.preventDefault();
-                    replayDeleter(list[i].filePassword, list[i].fileid);
-                  };
-                  locker.appendChild(deleter);
-                  commentArea.appendChild(locker);
+                  continue;
+                  // let locker = document.createElement('span');
+                  // locker.innerHTML = `<i class="fa-solid fa-lock"></i> &nbsp`;
+                  // let deleter = document.createElement('i');
+                  // deleter.classList.add('fa-solid');
+                  // deleter.classList.add('fa-xmark');
+                  // deleter.onclick = (e) => {
+                  //   e.stopPropagation();
+                  //   e.preventDefault();
+                  //   replayDeleter(list[i].filePassword, list[i].fileid);
+                  // };
+                  // locker.appendChild(deleter);
+                  // commentArea.appendChild(locker);
                 }
                 li.appendChild(titleArea);
                 li.appendChild(commentArea);
@@ -337,19 +385,21 @@
                 };
                 ul.append(li);
               }
-              count++;
+              // count++;
+              // console.log(ul.children.length);
+              if (ul.children.length < 10) {
+                loadLists();
+              }
             } else {
               let loader = document.querySelector('#loader');
               loader.innerText = 'No more data';
             }
           });
         } else {
-          searchPage++;
           search();
         }
-
-        // }, 1000);
-      });
+      };
+      let observer = new IntersectionObserver(loadLists);
       let loader = document.querySelector('#loader');
       observer.observe(loader);
 
@@ -485,8 +535,18 @@
           },
         });
         if (res.data.status == '성공') {
-          alert('업로드 성공');
-          window.location.reload();
+          if (sel_type == 'false') {
+            // alert(`업로드 성공 \n고유코드: ${myUrl}`);
+            await navigator.clipboard.writeText(`${myUrl}`);
+            window.prompt(
+              `업로드 성공 \n고유코드가 복사되었습니다`,
+              `${myUrl}`,
+            );
+            window.location.reload();
+          } else {
+            alert('업로드 성공');
+            window.location.reload();
+          }
         } else {
           alert('업로드 실패');
         }
@@ -513,10 +573,18 @@
         }
       };
 
+      const checker = (which) => {
+        let show = document.querySelector('.warn');
+        if (which.value == 'false') {
+          show.style.display = 'flex';
+        } else {
+          show.style.display = 'none';
+        }
+      };
+
       const pwGenerator = () => {
         let pwConfirmed = '';
         let tempPW = '' + Date.now();
-        console.log(tempPW);
         let str = '';
         let mix = [
           'sd',
@@ -571,7 +639,7 @@
       const searchAfterCountReset = () => {
         let loader = document.querySelector('#loader');
         loader.innerText = 'Load...';
-        searchPage = 1;
+        searchPage = 0;
         search();
       };
 
@@ -579,11 +647,27 @@
         let keyword = document.querySelector('.search-input').value;
         keyword = keyword.replace(' ', '_');
         searchKeyword = keyword;
-        let res = await axios({
-          method: 'post',
-          url: '/search',
-          data: { keyword: keyword, page: searchPage },
-        });
+        var chk_radio = document.getElementsByName('search-type');
+        var sel_type = '';
+        for (var i = 0; i < chk_radio.length; i++) {
+          if (chk_radio[i].checked == true) {
+            sel_type = chk_radio[i].value;
+          }
+        }
+        let res;
+        if (sel_type == 'proper') {
+          res = await axios({
+            method: 'post',
+            url: '/search',
+            data: { keyword: keyword, page: ++searchPage },
+          });
+        } else {
+          res = await axios({
+            method: 'post',
+            url: '/searchByCode',
+            data: { keyword: keyword },
+          });
+        }
         if (res.data.status == '성공') {
           let list = res.data.data;
           if (list.length > 0) {
@@ -600,7 +684,7 @@
               let title = list[i].title.replace('_', ' ');
               titleArea.innerText = title;
               titleArea.style.cssText = `
-                  max-width: 260px;
+                  max-width: 75%;
                   overflow: hidden;
                   white-space: nowrap;
                   text-overflow: ellipsis;
@@ -627,18 +711,23 @@
                 commentArea.appendChild(deleter);
               } else {
                 //비공개일때
-                let locker = document.createElement('span');
-                locker.innerHTML = `<i class="fa-solid fa-lock"></i> &nbsp`;
-                let deleter = document.createElement('i');
-                deleter.classList.add('fa-solid');
-                deleter.classList.add('fa-xmark');
-                deleter.onclick = (e) => {
-                  e.stopPropagation();
-                  e.preventDefault();
-                  replayDeleter(list[i].filePassword, list[i].fileid);
-                };
-                locker.appendChild(deleter);
-                commentArea.appendChild(locker);
+                if (sel_type == 'proper') {
+                  continue;
+                } else {
+                  ul.innerHTML = '';
+                  let locker = document.createElement('span');
+                  locker.innerHTML = `<i class="fa-solid fa-lock"></i> &nbsp`;
+                  let deleter = document.createElement('i');
+                  deleter.classList.add('fa-solid');
+                  deleter.classList.add('fa-xmark');
+                  deleter.onclick = (e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    replayDeleter(list[i].filePassword, list[i].fileid);
+                  };
+                  locker.appendChild(deleter);
+                  commentArea.appendChild(locker);
+                }
               }
               li.appendChild(titleArea);
               li.appendChild(commentArea);
@@ -654,6 +743,14 @@
               };
               ul.append(li);
             }
+            if (list.length < 10) {
+              let loader = document.querySelector('#loader');
+              if (sel_type == 'proper') {
+                loader.innerText = 'No more data';
+              } else {
+                loader.innerText = '';
+              }
+            }
           } else {
             if (searchPage == 1) {
               let ul = document.querySelector('#list');
@@ -662,6 +759,8 @@
             let loader = document.querySelector('#loader');
             loader.innerText = 'No more data';
           }
+        } else {
+          console.log('error occured');
         }
       };
 

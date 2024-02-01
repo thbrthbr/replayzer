@@ -38,6 +38,7 @@ router.post('/replay_delete', Controller.remove);
 router.get('/replay/:id', Controller.show);
 router.get('/replayShow', Controller.replayShow);
 router.post('/search', Controller.search);
+router.post('/searchByCode', Controller.searchByCode);
 
 router.get('/getComments/:pageid', Controller.getComments);
 router.post('/commentAdd', Controller.commentAdd);

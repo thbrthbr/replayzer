@@ -3,72 +3,6 @@ const { Comment } = require('../models');
 const { Op } = require('sequelize');
 const fs = require('fs');
 
-// const pwGenerator = () => {
-//   let pwConfirmed = '';
-//   let tempPW = '' + Date.now();
-//   console.log(tempPW);
-//   let str = '';
-//   let mix = [
-//     'sd',
-//     'Dw',
-//     'poiuytfrds',
-//     '1qw2ewr4fty6u7',
-//     'wqe21',
-//     'dczvghvz3',
-//     'asdfghjk',
-//     'zxcvbnm',
-//     'd21e3',
-//     '0we9fb203hedw',
-//     '23ePlhd',
-//     'POIUYTRDS',
-//     'LKJHGVCX',
-//     'NBVCXwdefPOIUYfewTR',
-//     'pp1t',
-//     'e',
-//     '090xcv0hdj2',
-//     '66plz',
-//     'qedoo2',
-//     'efoxcvejroc',
-//     'E',
-//     '213ed1e',
-//     'we2ee34',
-//     '20dExczvzcxvEeewjg',
-//     '55DEw25fewdefwc',
-//   ];
-//   mix.sort(() => Math.random() - 0.5);
-//   for (let i = 0; i < tempPW.length; i++) {
-//     let each = mix[+tempPW[i]];
-//     let tempEach = each.split('');
-//     tempEach.sort(() => Math.random() - 0.5);
-//     tempEach = tempEach.join('');
-//     str += tempEach;
-//   }
-//   pwConfirmed = str;
-//   if (pwConfirmed.length > 500) {
-//     let temp = pwConfirmed.split('');
-//     temp.splice(0, 499);
-//     pwConfirmed = temp;
-//   }
-//   return pwConfirmed;
-// };
-
-// exports.temp = async (req, res) => {
-//   for (let i = 0; i < 117; i++) {
-//     // let hello = pwGenerator();
-//     let areyouthere = await List.findOne({ where: { id: i } });
-//     if (areyouthere) {
-//       await List.update(
-//         {
-//           privateURL: 'none',
-//         },
-//         {
-//           where: { id: i },
-//         },
-//       );
-//     }
-//   }
-// };
-
 exports.intro = (req, res) => {
   res.render('main');
 };
@@ -79,7 +13,10 @@ exports.getList = async (req, res) => {
   let comments = await Comment.findAll();
   list = list.reverse();
   let arr = [];
-  for (let i = (page - 1) * 10; i < page * 10; i++) {
+  let limit = page * 10;
+  // console.log(page);
+  // console.log(limit);
+  for (let i = (page - 1) * 10; i < limit; i++) {
     if (list[i]) {
       let commentNum = 0;
       for (let j = 0; j < comments.length; j++) {
@@ -140,7 +77,7 @@ exports.remove = async (req, res) => {
 };
 
 exports.replayShow = async (req, res) => {
-  console.log(req.session.which.id);
+  // console.log(req.session.which.id);
   let check = parseInt(req.session.which.id);
   let response;
   let numbering = parseInt(req.session.which.id);
@@ -213,6 +150,39 @@ exports.search = async (req, res) => {
   }
 };
 
+exports.searchByCode = async (req, res) => {
+  try {
+    let result = await List.findOne({
+      where: {
+        privateURL: req.body.keyword,
+      },
+    });
+    let comments = await Comment.findAll();
+    let arr = [];
+    if (result) {
+      let commentNum = 0;
+      for (let j = 0; j < comments.length; j++) {
+        if (result.dataValues.id == comments[j].dataValues.pageid) {
+          commentNum++;
+        }
+      }
+      let obj = {
+        fileid: result.dataValues.id,
+        title: result.dataValues.title,
+        fileName: result.dataValues.fileName,
+        filePassword: result.dataValues.filePassword,
+        locked: result.dataValues.locked,
+        privateURL: result.dataValues.privateURL,
+        commentNum: commentNum,
+      };
+      arr.push(obj);
+    }
+    res.send({ status: '성공', data: arr });
+  } catch (e) {
+    res.send({ status: '실패' });
+  }
+};
+
 exports.getComments = async (req, res) => {
   let firstly = '' + req.session.which.id;
   let check = parseInt(firstly);
@@ -233,7 +203,6 @@ exports.getComments = async (req, res) => {
 
 exports.commentAdd = async (req, res) => {
   try {
-    console.log(req.body);
     let check = parseInt(req.body.pageid);
     let result;
     let numbering = parseInt(req.body.pageid);
@@ -258,7 +227,7 @@ exports.commentAdd = async (req, res) => {
 };
 
 exports.commentSub = async (req, res) => {
-  console.log(req.body);
+  // console.log(req.body);
   await Comment.destroy({ where: { id: req.body.commentId } });
   res.send({ status: '성공' });
 };
