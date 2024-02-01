@@ -390,6 +390,9 @@
               if (ul.children.length < 10) {
                 loadLists();
               }
+              if (list.length < 10) {
+                loadLists();
+              }
             } else {
               let loader = document.querySelector('#loader');
               loader.innerText = 'No more data';
@@ -743,10 +746,13 @@
             if (list.length < 10) {
               let loader = document.querySelector('#loader');
               if (sel_type == 'proper') {
-                loader.innerText = 'No more data';
+                search();
               } else {
                 loader.innerText = '';
               }
+            }
+            if (ul.children.length < 10) {
+              search();
             }
           } else {
             if (searchPage == 1) {
