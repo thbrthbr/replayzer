@@ -152,35 +152,39 @@ exports.search = async (req, res) => {
 
 exports.searchByCode = async (req, res) => {
   try {
-    let result = await List.findOne({
-      where: {
-        privateURL: req.body.keyword,
-      },
-    });
-    if (result) {
-      let comments = await Comment.findAll();
-      let arr = [];
-      if (result) {
-        let commentNum = 0;
-        for (let j = 0; j < comments.length; j++) {
-          if (result.dataValues.id == comments[j].dataValues.pageid) {
-            commentNum++;
-          }
-        }
-        let obj = {
-          fileid: result.dataValues.id,
-          title: result.dataValues.title,
-          fileName: result.dataValues.fileName,
-          filePassword: result.dataValues.filePassword,
-          locked: result.dataValues.locked,
-          privateURL: result.dataValues.privateURL,
-          commentNum: commentNum,
-        };
-        arr.push(obj);
-      }
-      res.send({ status: '성공', data: arr });
-    } else {
+    if (req.body.keyword == 'none') {
       res.send({ status: '실패' });
+    } else {
+      let result = await List.findOne({
+        where: {
+          privateURL: req.body.keyword,
+        },
+      });
+      if (result) {
+        let comments = await Comment.findAll();
+        let arr = [];
+        if (result) {
+          let commentNum = 0;
+          for (let j = 0; j < comments.length; j++) {
+            if (result.dataValues.id == comments[j].dataValues.pageid) {
+              commentNum++;
+            }
+          }
+          let obj = {
+            fileid: result.dataValues.id,
+            title: result.dataValues.title,
+            fileName: result.dataValues.fileName,
+            filePassword: result.dataValues.filePassword,
+            locked: result.dataValues.locked,
+            privateURL: result.dataValues.privateURL,
+            commentNum: commentNum,
+          };
+          arr.push(obj);
+        }
+        res.send({ status: '성공', data: arr });
+      } else {
+        res.send({ status: '실패' });
+      }
     }
   } catch (e) {
     res.send({ status: '실패' });
