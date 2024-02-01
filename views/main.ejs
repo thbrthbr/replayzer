@@ -537,8 +537,8 @@
         if (res.data.status == '성공') {
           if (sel_type == 'false') {
             // alert(`업로드 성공 \n고유코드: ${myUrl}`);
-            await navigator.clipboard.writeText(myUrl);
-            window.prompt(`업로드 성공 \n고유코드가 복사되었습니다`, myUrl);
+            // await navigator.clipboard.writeText(myUrl);
+            window.prompt(`업로드 성공 \n고유코드를 복사해두세요`, myUrl);
             window.location.reload();
           } else {
             alert('업로드 성공');
