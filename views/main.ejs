@@ -757,7 +757,10 @@
             loader.innerText = 'No more data';
           }
         } else {
-          console.log('error occured');
+          let ul = document.querySelector('#list');
+          ul.innerHTML = '';
+          let loader = document.querySelector('#loader');
+          loader.innerText = 'No more data';
         }
       };
 
