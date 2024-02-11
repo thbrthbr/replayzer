@@ -34,7 +34,7 @@ app.use(
 );
 
 //정적파일 설정
-app.use('/public', express.static(__dirname + '/public'));
+app.use(express.static('views'));
 
 //router분리
 const router = require('./routes/main');

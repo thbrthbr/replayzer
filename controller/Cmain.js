@@ -1,8 +1,13 @@
-const { List } = require('../models');
-const { Comment } = require('../models');
+const { List, Comment, Winner } = require('../models');
 const { Op } = require('sequelize');
 const fs = require('fs');
 
+exports.intro = (req, res) => {
+  res.render('main');
+};
+exports.awards = (req, res) => {
+  res.render('awards');
+};
 exports.intro = (req, res) => {
   res.render('main');
 };
@@ -63,6 +68,21 @@ exports.upload = async (req, res) => {
     });
   } catch (e) {
     console.log('error: ', e);
+    res.send({ status: '실패' });
+  }
+};
+
+exports.upload2 = async (req, res) => {
+  try {
+    let list = await Winner.create({
+      title: req.body.title,
+      filename: req.file.filename,
+      date: req.body.date,
+      yearOwner: req.body.yearOwner,
+    });
+    res.send({ status: '성공' });
+  } catch (e) {
+    console.log(e);
     res.send({ status: '실패' });
   }
 };
@@ -238,4 +258,10 @@ exports.commentSub = async (req, res) => {
   // console.log(req.body);
   await Comment.destroy({ where: { id: req.body.commentId } });
   res.send({ status: '성공' });
+};
+
+exports.getCards = async (req, res) => {
+  let list = await Winner.findAll();
+  console.log(list);
+  res.send({ status: '성공', data: list, pw: process.env.DB_PW });
 };

@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      src="https://code.jquery.com/jquery-3.7.0.min.js"
+      integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g="
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lobster&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <title>REPLAYZER</title>
+    <style>
+      body {
+        background-color: #1e1424;
+        position: relative;
+      }
+      .logo {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+      }
+      .logo-img {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        cursor: pointer;
+      }
+      .place {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .winners-celeb-text {
+        cursor: pointer;
+        font-family: 'Lobster', sans-serif;
+        font-weight: 400;
+        font-style: normal;
+        color: white;
+        font-size: 51px;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        background-image: linear-gradient(
+          175deg,
+          orange,
+          orange,
+          orange,
+          yellow,
+          yellow,
+          white,
+          yellow,
+          yellow,
+          orange,
+          orange,
+          orange
+        );
+        background-clip: text;
+        -webkit-background-clip: text;
+        color: transparent;
+      }
+      .cover {
+        position: absolute;
+        top: 0;
+        /* width: 90vw; */
+        width: 100vw;
+        height: 100%;
+        min-height: 800px;
+        padding: 8px;
+        border-radius: 5px;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 2;
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        /* justify-content: center; */
+      }
+      .upload-section {
+        overflow: auto;
+        top: 40px;
+        width: 90vw;
+        min-height: 320px;
+        height: 65vh;
+        background-color: white;
+        border-radius: 5px;
+        flex-direction: column;
+        align-items: center;
+        display: flex;
+        padding: 20px;
+        box-sizing: border-box;
+        position: sticky;
+      }
+      .section-top-area {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        width: 100%;
+        display: flex;
+        justify-content: end;
+      }
+      .uploader {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 80px;
+        height: 30px;
+        cursor: pointer;
+        margin: 5px;
+        padding: 1px;
+        border-style: solid;
+        border-radius: 5px;
+        border-width: 1px;
+        border-color: #accfff;
+        color: black;
+        background-color: white;
+        font-size: 15px;
+      }
+      #card-upload {
+        position: absolute;
+        width: 0;
+        height: 0;
+        padding: 0;
+        overflow: hidden;
+        border: 0;
+      }
+      .card-container {
+        width: 90vw;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+      #eachCard-holder {
+        width: 90%;
+        max-width: 600px;
+      }
+      #eachCard {
+        width: 100%;
+        border-radius: 10px;
+      }
+      .upload-button {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 20px;
+        height: 33px;
+        margin: 5px;
+        padding: 1px;
+        cursor: pointer;
+        border: none;
+        border-radius: 5px;
+        font-size: 15px;
+        color: white;
+        background-color: transparent;
+      }
+      .preview {
+        width: 80%;
+        border: solid 1px #ccc;
+        border-radius: 5px;
+        max-width: 500px;
+      }
+      .logo-img {
+        width: 80%;
+        max-width: 300px;
+      }
+      .label {
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      @font-face {
+        font-family: 'PyeongChangPeace-Bold';
+        src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2206-02@1.0/PyeongChangPeace-Bold.woff2')
+          format('woff2');
+        font-weight: 700;
+        font-style: normal;
+      }
+      #date-liner {
+        font-family: 'PyeongChangPeace-Bold';
+        font-size: 30px;
+        color: white;
+        text-align: center;
+        margin: 5px;
+      }
+      .up-button {
+        width: 90vw;
+        max-width: 600px;
+        display: flex;
+        justify-content: end;
+      }
+      .upload-button2 {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 80px;
+        height: 33px;
+        margin: 5px;
+        padding: 1px;
+        cursor: pointer;
+        border-style: solid;
+        border-radius: 5px;
+        border-width: 1px;
+        font-size: 15px;
+        border-color: #ccc;
+        color: black;
+        background-color: white;
+      }
+      .upload-button2:hover {
+        border-style: none;
+        background-color: #b7b7e4;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="logo">
+      <img class="logo-img" src="default/trophy.png" onclick="refresh()" />
+    </div>
+    <div class="place">
+      <div class="winners-celeb-text" onclick="refresh()">Hall of Fame</div>
+      <div class="cover" onclick="sectionHandler()">
+        <div class="upload-section">
+          <div class="section-top-area">
+            <i
+              class="fa-solid fa-xmark"
+              style="cursor: pointer"
+              onclick="sectionHandler()"
+            ></i>
+          </div>
+          <br />
+          <input
+            class="winner-image"
+            id="card-upload"
+            name="card-upload"
+            type="file"
+            onchange="uploadCard()"
+          />
+          <label class="label" for="card-upload">
+            <img class="preview" src="default/blank.png" />
+          </label>
+          <br />
+          유저이름<input type="text" class="title" />
+          <br />
+          날짜<input type="text" class="date" />
+          <br />
+          특수카드여부
+          <div>
+            <span>YES<input name="special" value="true" type="radio" /></span>
+            <span
+              >NO<input name="special" value="false" type="radio" checked
+            /></span>
+          </div>
+          <br />
+          <button
+            id="upload-button"
+            class="upload-button2"
+            type="button"
+            onclick="upload2()"
+          >
+            <p class="file-text">UPLOAD</p>
+          </button>
+          <br />
+        </div>
+      </div>
+      <!-- <a href="/"><button>헤이</button></a> -->
+      <br />
+      <br />
+      <ul class="card-container"></ul>
+      <div class="up-button">
+        <button class="upload-button" onclick="unlock()">
+          <i class="fa-solid fa-arrow-up-from-bracket"></i>
+        </button>
+      </div>
+      <br />
+    </div>
+    <script>
+      let pw = '';
+      axios({
+        method: 'get',
+        url: '/getCards',
+      }).then((res) => {
+        console.log(res.data);
+        pw = res.data.pw;
+        let ul = document.querySelector('.card-container');
+        let reverse = res.data.data.reverse();
+        if (reverse.length > 0) {
+          for (let i = 0; i < reverse.length; i++) {
+            let li = document.createElement('li');
+            let imgSetter = document.createElement('img');
+            let titleSetter = document.createElement('div');
+            titleSetter.innerHTML =
+              `<i class="fa-solid fa-award"></i> ` +
+              reverse[i].date +
+              ' ' +
+              reverse[i].title;
+            imgSetter.src = `img/${reverse[i].filename}`;
+            imgSetter.id = 'eachCard';
+            titleSetter.id = 'date-liner';
+            li.id = 'eachCard-holder';
+            li.appendChild(titleSetter);
+            li.appendChild(imgSetter);
+            li.appendChild(document.createElement('br'));
+            li.appendChild(document.createElement('br'));
+            ul.appendChild(li);
+          }
+        } else {
+          let titleSetter = document.createElement('div');
+          let li = document.createElement('li');
+          titleSetter.innerHTML = 'Legend will come soon...';
+          titleSetter.id = 'date-liner';
+          li.appendChild(titleSetter);
+          ul.appendChild(li);
+        }
+      });
+
+      const unlock = () => {
+        let prompt = window.prompt('비밀번호를 입력해주세요');
+        if (prompt == pw) {
+          sectionHandler();
+        } else {
+          if (prompt) {
+            alert('비밀번호를 확인해주세요');
+          }
+        }
+      };
+
+      const uploadCard = () => {
+        let winImg = document.querySelector('.winner-image');
+        let reader = new FileReader();
+        reader.onloadend = () => {
+          let showPreview = document.querySelector('.preview');
+          showPreview.src = reader.result;
+        };
+        reader.readAsDataURL(winImg.files[0]);
+      };
+
+      const sectionHandler = () => {
+        document.querySelector('.preview').src = 'default/blank.png';
+        if (document.querySelector('.cover').style.display == 'flex') {
+          document.querySelector('.cover').style.display = 'none';
+          let body = document.getElementsByTagName('body')[0];
+          body.style.overflow = 'auto';
+        } else {
+          document.querySelector('.cover').style.display = 'flex';
+          let body = document.getElementsByTagName('body')[0];
+          body.style.overflow = 'hidden';
+        }
+      };
+
+      const upload2 = async () => {
+        const file = document.querySelector('.winner-image');
+        const title = document.querySelector('.title');
+        const date = document.querySelector('.date');
+        var chk_radio = document.getElementsByName('special');
+        var sel_type = '';
+        for (var i = 0; i < chk_radio.length; i++) {
+          if (chk_radio[i].checked == true) {
+            sel_type = chk_radio[i].value;
+          }
+        }
+        const formData = new FormData();
+        formData.append('title', title.value);
+        formData.append('card-upload', file.files[0]);
+        formData.append('date', date.value);
+        formData.append('yearOwner', sel_type);
+        console.log(formData);
+        console.log(file.files[0]);
+        let res = await axios({
+          method: 'post',
+          url: '/card_upload',
+          data: formData,
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+        if (res.data.status == '성공') {
+          window.location.reload();
+        } else {
+          console.log('엥');
+        }
+      };
+
+      const refresh = () => {
+        window.location.reload();
+      };
+
+      document
+        .querySelector('.upload-section')
+        .addEventListener('click', (e) => {
+          e.stopPropagation();
+        });
+    </script>
+  </body>
+</html>
