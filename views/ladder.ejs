@@ -269,11 +269,12 @@
             user.innerText = sorted[i].user;
             score.innerText = sorted[i].score;
           } else {
-            order++;
+            order += 1;
             rankOrder.innerText = order + carry;
             user.innerText = sorted[i].user;
             score.innerText = sorted[i].score;
             present = sorted[i].score;
+            order = order + carry;
             carry = 0;
           }
           const inputDateString = sorted[i].updatedAt;
