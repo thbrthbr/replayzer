@@ -4,6 +4,7 @@ const development = {
   database: 'replayzer',
   host: '127.0.0.1',
   dialect: 'mysql',
+  timezone: '+09:00',
 };
 const test = {
   username: 'root',
@@ -11,6 +12,7 @@ const test = {
   database: 'database_test',
   host: '127.0.0.1',
   dialect: 'mysql',
+  timezone: '+09:00',
 };
 const production = {
   username: process.env.DB_USER,
@@ -18,6 +20,7 @@ const production = {
   database: 'production',
   host: 'kdt-lecture-test.c0m1fdifsbpq.us-east-2.rds.amazonaws.com',
   dialect: 'mysql',
+  timezone: '+09:00',
 };
 
 module.exports = { production };

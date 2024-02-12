@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      src="https://code.jquery.com/jquery-3.7.0.min.js"
+      integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g="
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lobster&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <title>REPLAYZER</title>
+    <style>
+      body {
+        background-color: #1e1424;
+        position: relative;
+      }
+      .logo {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+      }
+      .logo-img {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        cursor: pointer;
+      }
+      .place {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .winners-celeb-text {
+        cursor: pointer;
+        font-family: 'Lobster', sans-serif;
+        font-weight: 400;
+        font-style: normal;
+        color: white;
+        font-size: 51px;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        background-image: linear-gradient(
+          175deg,
+          orange,
+          orange,
+          orange,
+          yellow,
+          yellow,
+          white,
+          yellow,
+          yellow,
+          orange,
+          orange,
+          orange
+        );
+        background-clip: text;
+        -webkit-background-clip: text;
+        color: transparent;
+      }
+      .cover {
+        position: absolute;
+        top: 0;
+        /* width: 90vw; */
+        width: 100vw;
+        height: 100%;
+        min-height: 800px;
+        padding: 8px;
+        border-radius: 5px;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 2;
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        /* justify-content: center; */
+      }
+      .upload-section {
+        overflow: auto;
+        top: 40px;
+        width: 90vw;
+        min-height: 320px;
+        height: 65vh;
+        background-color: white;
+        border-radius: 5px;
+        flex-direction: column;
+        align-items: center;
+        display: flex;
+        padding: 20px;
+        box-sizing: border-box;
+        position: sticky;
+      }
+      .section-top-area {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        width: 100%;
+        display: flex;
+        justify-content: end;
+      }
+      .uploader {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 80px;
+        height: 30px;
+        cursor: pointer;
+        margin: 5px;
+        padding: 1px;
+        border-style: solid;
+        border-radius: 5px;
+        border-width: 1px;
+        border-color: #accfff;
+        color: black;
+        background-color: white;
+        font-size: 15px;
+      }
+      #card-upload {
+        position: absolute;
+        width: 0;
+        height: 0;
+        padding: 0;
+        overflow: hidden;
+        border: 0;
+      }
+      .upload-button {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 20px;
+        height: 33px;
+        margin: 5px;
+        padding: 1px;
+        cursor: pointer;
+        border: none;
+        border-radius: 5px;
+        font-size: 15px;
+        color: white;
+        background-color: transparent;
+      }
+      .logo-img {
+        width: 80%;
+        max-width: 300px;
+      }
+      .up-button {
+        width: 90vw;
+        max-width: 600px;
+        display: flex;
+        justify-content: end;
+      }
+      .upload-button2 {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 80px;
+        height: 33px;
+        margin: 5px;
+        padding: 1px;
+        cursor: pointer;
+        border-style: solid;
+        border-radius: 5px;
+        border-width: 1px;
+        font-size: 15px;
+        border-color: #ccc;
+        color: black;
+        background-color: white;
+      }
+      .upload-button2:hover {
+        border-style: none;
+        background-color: #b7b7e4;
+        color: white;
+      }
+      .ladder-table {
+        border-color: #ccc;
+      }
+      td {
+        color: white;
+      }
+      tr {
+        color: white;
+      }
+      .data-input {
+        resize: none;
+        width: 80%;
+        height: 50%;
+        border: 1px solid #ccc;
+      }
+      textarea:focus {
+        outline: none;
+      }
+      .update-dater {
+        color: white;
+        font-size: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="logo">
+      <img class="logo-img" src="default/rank.png" onclick="refresh()" />
+    </div>
+    <div class="place">
+      <div class="winners-celeb-text" onclick="refresh()">Ladder</div>
+      <div class="cover" onclick="sectionHandler()">
+        <div class="upload-section">
+          <div class="section-top-area">
+            <i
+              class="fa-solid fa-xmark"
+              style="cursor: pointer"
+              onclick="sectionHandler()"
+            ></i>
+          </div>
+          <textarea class="data-input"></textarea>
+          <button class="upload-button2" onclick="updateResult()">
+            SUBMIT
+          </button>
+        </div>
+      </div>
+      <br />
+      <br />
+      <table class="ladder-table" border="1">
+        <th>순위</th>
+        <th>닉네임</th>
+        <th>점수</th>
+      </table>
+      <div class="update-dater">Last Update :</div>
+      <div class="up-button">
+        <button class="upload-button" onclick="unlock()">
+          <i class="fa-solid fa-arrow-up-from-bracket"></i>
+        </button>
+      </div>
+      <br />
+    </div>
+    <script>
+      let pw = [];
+      axios({
+        method: 'get',
+        url: '/getLadder',
+      }).then((res) => {
+        let table = document.querySelector('.ladder-table');
+        let order = 0;
+        let present = 0;
+        let carry = 0;
+        let sorted = res.data.data.slice();
+        pw = res.data.pw;
+        sorted.sort((x, y) => y.score - x.score);
+        let lastDate = [];
+        for (let i = 0; i < sorted.length; i++) {
+          let tr = document.createElement('tr');
+          let rankOrder = document.createElement('td');
+          let user = document.createElement('td');
+          let score = document.createElement('td');
+          if (present == sorted[i].score) {
+            carry++;
+            rankOrder.innerText = order;
+            user.innerText = sorted[i].user;
+            score.innerText = sorted[i].score;
+          } else {
+            order++;
+            rankOrder.innerText = order + carry;
+            user.innerText = sorted[i].user;
+            score.innerText = sorted[i].score;
+            present = sorted[i].score;
+            carry = 0;
+          }
+          const inputDateString = sorted[i].updatedAt;
+          const utcDate = new Date(inputDateString);
+          const koreaTime = new Date(utcDate.getTime() + 9 * 60 * 60 * 1000);
+          const koreaTimeString = koreaTime
+            .toISOString()
+            .replace('T', ' ')
+            .replace('.000Z', '');
+          lastDate.push(koreaTimeString);
+          tr.appendChild(rankOrder);
+          tr.appendChild(user);
+          tr.appendChild(score);
+          table.appendChild(tr);
+        }
+        let lastUpdate = lastDate.sort().reverse()[0];
+        let dater = document.querySelector('.update-dater');
+        if (lastUpdate) {
+          dater.innerText += ` ${lastUpdate}`;
+        } else {
+          dater.innerText += ' not yet';
+        }
+      });
+
+      const unlock = () => {
+        let prompt = window.prompt('비밀번호를 입력해주세요');
+        if (pw.includes(prompt)) {
+          sectionHandler();
+        } else {
+          if (prompt) {
+            alert('비밀번호를 확인해주세요');
+          }
+        }
+      };
+
+      const sectionHandler = () => {
+        if (document.querySelector('.cover').style.display == 'flex') {
+          document.querySelector('.cover').style.display = 'none';
+          let body = document.getElementsByTagName('body')[0];
+          body.style.overflow = 'auto';
+        } else {
+          document.querySelector('.cover').style.display = 'flex';
+          let body = document.getElementsByTagName('body')[0];
+          body.style.overflow = 'hidden';
+        }
+      };
+
+      const refresh = () => {
+        window.location.reload();
+      };
+
+      const updateResult = async () => {
+        sectionHandler();
+        let text = document.querySelector('.data-input');
+        let splited = text.value.split('\n');
+        let obj = {};
+        for (let i = 0; i < splited.length; i++) {
+          if (
+            splited[i].includes('has') &&
+            splited[i].includes('match') &&
+            !splited[i].includes(':')
+          ) {
+            let secondTask = splited[i].split(' ');
+            let last = secondTask[secondTask.length - 1];
+            if (last[last.length - 1] == '.') {
+              last = last.slice(0, last.length - 1);
+            }
+            obj[secondTask[0]] = 0;
+            obj[last] = 0;
+          }
+        }
+        for (let i = 0; i < splited.length; i++) {
+          if (
+            splited[i].includes('has') &&
+            splited[i].includes('match') &&
+            splited[i].includes('won') &&
+            !splited[i].includes(':')
+          ) {
+            let secondTask = splited[i].split(' ');
+            let last = secondTask[secondTask.length - 1];
+            if (last[last.length - 1] == '.') {
+              last = last.slice(0, last.length - 1);
+            }
+            obj[secondTask[0]] += 10;
+            obj[last] -= 10;
+          } else if (
+            splited[i].includes('has') &&
+            splited[i].includes('match') &&
+            splited[i].includes('lost') &&
+            !splited[i].includes(':')
+          ) {
+            let secondTask = splited[i].split(' ');
+            let last = secondTask[secondTask.length - 1];
+            if (last[last.length - 1] == '.') {
+              last = last.slice(0, last.length - 1);
+            }
+            obj[secondTask[0]] -= 10;
+            obj[last] += 10;
+          }
+        }
+        console.log(obj);
+        let res = await axios({
+          method: 'post',
+          url: '/updateLadder',
+          data: { data: obj, log: text.value },
+        });
+        if (res.data.status == '성공') {
+          alert('점수가 업데이트 되었습니다');
+          window.location.reload();
+        } else {
+          alert('오늘 점수는 이미 업데이트 되어있습니다');
+          window.location.reload();
+        }
+      };
+
+      document
+        .querySelector('.upload-section')
+        .addEventListener('click', (e) => {
+          e.stopPropagation();
+        });
+    </script>
+  </body>
+</html>

@@ -15,6 +15,7 @@ const sequelize = new Sequelize(
 
 //모델
 db.List = require('./List')(sequelize);
+db.Ladder = require('./Ladder')(sequelize);
 db.Winner = require('./Winner')(sequelize);
 db.Comment = require('./Comment')(sequelize);
 

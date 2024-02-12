@@ -1,4 +1,4 @@
-const { List, Comment, Winner } = require('../models');
+const { List, Comment, Winner, Ladder } = require('../models');
 const { Op } = require('sequelize');
 const fs = require('fs');
 
@@ -7,6 +7,9 @@ exports.intro = (req, res) => {
 };
 exports.awards = (req, res) => {
   res.render('awards');
+};
+exports.ladder = (req, res) => {
+  res.render('ladder');
 };
 exports.intro = (req, res) => {
   res.render('main');
@@ -264,4 +267,66 @@ exports.getCards = async (req, res) => {
   let list = await Winner.findAll();
   console.log(list);
   res.send({ status: '성공', data: list, pw: process.env.DB_PW });
+};
+exports.getLadder = async (req, res) => {
+  let ladder = await Ladder.findAll();
+  let pwList = [
+    process.env.DB_PW,
+    process.env.DB_STAFF_FIR_PW,
+    process.env.DB_STAFF_SEC_PW,
+  ];
+  res.send({ status: '성공', data: ladder, pw: pwList });
+};
+
+exports.updateLadder = async (req, res) => {
+  // let ladder = await Ladder.findAll();
+  // for (let i = 0; i < ladder.length; i++) {
+  //   const inputDateString = ladder[i].dataValues.updatedAt;
+  //   const utcDate = new Date(inputDateString);
+  //   const koreaTime = new Date(utcDate.getTime() + 9 * 60 * 60 * 1000);
+  //   const koreaTimeString = koreaTime
+  //     .toISOString()
+  //     .replace('T', ' ')
+  //     .replace('.000Z', '');
+  //   let now = koreaTimeString.split(' ')[0];
+  //   console.log(now);
+  //   const currentDate = new Date();
+  //   const year = currentDate.getFullYear();
+  //   const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+  //   const day = String(currentDate.getDate()).padStart(2, '0');
+  //   console.log(`${year}-${month}-${day}`);
+  //   if (now == `${year}-${month}-${day}`) {
+  //     res.send({ status: '실패' });
+  //     return;
+  //   }
+  // }
+  //
+  // console.log(req.body.log);
+  let pair = Object.entries(req.body.data);
+  for (let i = 0; i < pair.length; i++) {
+    let result = await Ladder.findOne({
+      where: {
+        user: pair[i][0],
+      },
+    });
+    if (result) {
+      await Ladder.update(
+        {
+          user: pair[i][0],
+          score: result.score + pair[i][1],
+        },
+        {
+          where: {
+            user: pair[i][0],
+          },
+        },
+      );
+    } else {
+      await Ladder.create({
+        user: pair[i][0],
+        score: 1500 + pair[i][1],
+      });
+    }
+  }
+  res.send({ status: '성공' });
 };
