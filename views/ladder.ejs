@@ -206,6 +206,10 @@
         color: white;
         font-size: 10px;
       }
+      .warn {
+        color: red;
+        font-size: 10px;
+      }
     </style>
   </head>
   <body>
@@ -224,6 +228,19 @@
             ></i>
           </div>
           <textarea class="data-input"></textarea>
+          <div>
+            <span
+              >채팅텍스트<input
+                name="typical"
+                value="standard"
+                type="radio"
+                checked
+            /></span>
+            <span>로그<input name="typical" value="log" type="radio" /></span>
+          </div>
+          <div class="warn">
+            (기본적으로 로그는 사용하지 않으므로 클릭하지 마세요)
+          </div>
           <button class="upload-button2" onclick="updateResult()">
             SUBMIT
           </button>
@@ -328,65 +345,118 @@
 
       const updateResult = async () => {
         sectionHandler();
-        let text = document.querySelector('.data-input');
-        let splited = text.value.split('\n');
-        let obj = {};
-        for (let i = 0; i < splited.length; i++) {
-          if (
-            splited[i].includes('has') &&
-            splited[i].includes('match') &&
-            !splited[i].includes(':')
-          ) {
-            let secondTask = splited[i].split(' ');
-            let last = secondTask[secondTask.length - 1];
-            if (last[last.length - 1] == '.') {
-              last = last.slice(0, last.length - 1);
-            }
-            obj[secondTask[0]] = 0;
-            obj[last] = 0;
+        var chk_radio = document.getElementsByName('typical');
+        var sel_type = '';
+        for (var i = 0; i < chk_radio.length; i++) {
+          if (chk_radio[i].checked == true) {
+            sel_type = chk_radio[i].value;
           }
         }
-        for (let i = 0; i < splited.length; i++) {
-          if (
-            splited[i].includes('has') &&
-            splited[i].includes('match') &&
-            splited[i].includes('won') &&
-            !splited[i].includes(':')
-          ) {
-            let secondTask = splited[i].split(' ');
-            let last = secondTask[secondTask.length - 1];
-            if (last[last.length - 1] == '.') {
-              last = last.slice(0, last.length - 1);
+        if (sel_type == 'standard') {
+          let text = document.querySelector('.data-input');
+          let splited = text.value.split('\n');
+          let obj = {};
+          for (let i = 0; i < splited.length; i++) {
+            if (
+              splited[i].includes('has') &&
+              splited[i].includes('match') &&
+              !splited[i].includes(':')
+            ) {
+              let secondTask = splited[i].split(' ');
+              let last = secondTask[secondTask.length - 1];
+              if (last[last.length - 1] == '.') {
+                last = last.slice(0, last.length - 1);
+              }
+              obj[secondTask[0].toLowerCase()] = 0;
+              obj[last.toLowerCase()] = 0;
             }
-            obj[secondTask[0]] += 10;
-            obj[last] -= 10;
-          } else if (
-            splited[i].includes('has') &&
-            splited[i].includes('match') &&
-            splited[i].includes('lost') &&
-            !splited[i].includes(':')
-          ) {
-            let secondTask = splited[i].split(' ');
-            let last = secondTask[secondTask.length - 1];
-            if (last[last.length - 1] == '.') {
-              last = last.slice(0, last.length - 1);
-            }
-            obj[secondTask[0]] -= 10;
-            obj[last] += 10;
           }
-        }
-        console.log(obj);
-        let res = await axios({
-          method: 'post',
-          url: '/updateLadder',
-          data: { data: obj, log: text.value },
-        });
-        if (res.data.status == '성공') {
-          alert('점수가 업데이트 되었습니다');
-          window.location.reload();
+          for (let i = 0; i < splited.length; i++) {
+            if (
+              splited[i].includes('has') &&
+              splited[i].includes('match') &&
+              splited[i].includes('won') &&
+              !splited[i].includes(':')
+            ) {
+              let secondTask = splited[i].split(' ');
+              let last = secondTask[secondTask.length - 1];
+              if (last[last.length - 1] == '.') {
+                last = last.slice(0, last.length - 1);
+              }
+              obj[secondTask[0].toLowerCase()] += 10;
+              obj[last.toLowerCase()] -= 10;
+            } else if (
+              splited[i].includes('has') &&
+              splited[i].includes('match') &&
+              splited[i].includes('lost') &&
+              !splited[i].includes(':')
+            ) {
+              let secondTask = splited[i].split(' ');
+              let last = secondTask[secondTask.length - 1];
+              if (last[last.length - 1] == '.') {
+                last = last.slice(0, last.length - 1);
+              }
+              obj[secondTask[0].toLowerCase()] -= 10;
+              obj[last.toLowerCase()] += 10;
+            }
+          }
+          // console.log(obj);
+          let res = await axios({
+            method: 'post',
+            url: '/updateLadder',
+            data: { data: obj, log: text.value },
+          });
+          if (res.data.status == '성공') {
+            alert('점수가 업데이트 되었습니다');
+            window.location.reload();
+          } else {
+            alert('오늘 점수는 이미 업데이트 되어있습니다');
+            window.location.reload();
+          }
         } else {
-          alert('오늘 점수는 이미 업데이트 되어있습니다');
-          window.location.reload();
+          let text = document.querySelector('.data-input');
+          let splited = text.value.split('\n');
+          let obj = {};
+          // console.log(text.value);
+          for (let i = 0; i < splited.length; i++) {
+            if (splited[i].includes('battleend')) {
+              let secondTask = splited[i].split('|');
+              let last = secondTask[secondTask.length - 1];
+              obj[secondTask[3].toLowerCase()] = 0;
+              obj[secondTask[4].toLowerCase()] = 0;
+            }
+          }
+          for (let i = 0; i < splited.length; i++) {
+            if (
+              splited[i].includes('battleend') &&
+              splited[i].includes('win')
+            ) {
+              let secondTask = splited[i].split('|');
+              let last = secondTask[secondTask.length - 1];
+              obj[secondTask[3].toLowerCase()] += 10;
+              obj[secondTask[4].toLowerCase()] -= 10;
+            } else if (
+              splited[i].includes('battleend') &&
+              splited[i].includes('loss')
+            ) {
+              let secondTask = splited[i].split('|');
+              let last = secondTask[secondTask.length - 1];
+              obj[secondTask[3].toLowerCase()] -= 10;
+              obj[secondTask[4].toLowerCase()] += 10;
+            }
+          }
+          let res = await axios({
+            method: 'post',
+            url: '/updateLadder',
+            data: { data: obj, log: text.value },
+          });
+          if (res.data.status == '성공') {
+            alert('점수가 업데이트 되었습니다');
+            window.location.reload();
+          } else {
+            alert('오늘 점수는 이미 업데이트 되어있습니다');
+            window.location.reload();
+          }
         }
       };
 
