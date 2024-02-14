@@ -615,11 +615,11 @@
               }
               let ubaiai = 16 + (winnerScore - loserScore) / 25;
               if (ubaiai > 0) {
-                updated[winner] += parseInt(ubaiai);
-                updated[loser] -= parseInt(ubaiai);
+                updated[winner] += ubaiai.toFixed(3);
+                updated[loser] -= ubaiai.toFixed(3);
               } else {
-                updated[winner] -= parseInt(ubaiai);
-                updated[loser] += parseInt(ubaiai);
+                updated[winner] -= ubaiai.toFixed(3);
+                updated[loser] += ubaiai.toFixed(3);
               }
             } else if (
               splited[i].includes('battleend') &&
@@ -642,11 +642,11 @@
               }
               let ubaiai = 16 + (winnerScore - loserScore) / 25;
               if (ubaiai > 0) {
-                updated[winner] -= parseInt(ubaiai);
-                updated[loser] += parseInt(ubaiai);
+                updated[winner] -= ubaiai.toFixed(3);
+                updated[loser] += ubaiai.toFixed(3);
               } else {
-                updated[winner] += parseInt(ubaiai);
-                updated[loser] -= parseInt(ubaiai);
+                updated[winner] += ubaiai.toFixed(3);
+                updated[loser] -= ubaiai.toFixed(3);
               }
             }
           }
