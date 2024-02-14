@@ -20,6 +20,7 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
     />
+
     <title>REPLAYZER</title>
     <style>
       body {
@@ -210,9 +211,31 @@
         color: red;
         font-size: 10px;
       }
+      @font-face {
+        font-family: 'TTHakgyoansimUndongjangL';
+        src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2402_keris@1.0/TTHakgyoansimUndongjangL.woff2')
+          format('woff2');
+        font-weight: 300;
+        font-style: normal;
+      }
+      .updating {
+        font-family: 'TTHakgyoansimUndongjangL';
+        background-color: rgba(0, 0, 0, 0.5);
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        display: none;
+        justify-content: center;
+        align-items: center;
+        font-size: 50px;
+        color: white;
+      }
     </style>
   </head>
   <body>
+    <div class="updating">
+      <div>UPDATING...</div>
+    </div>
     <div class="logo">
       <img class="logo-img" src="default/rank.png" onclick="refresh()" />
     </div>
@@ -448,6 +471,187 @@
           let res = await axios({
             method: 'post',
             url: '/updateLadder',
+            data: { data: obj, log: text.value },
+          });
+          if (res.data.status == '성공') {
+            alert('점수가 업데이트 되었습니다');
+            window.location.reload();
+          } else {
+            alert('오늘 점수는 이미 업데이트 되어있습니다');
+            window.location.reload();
+          }
+        }
+      };
+
+      //2월 23일부터
+      const updateResult2 = async () => {
+        sectionHandler();
+        document.querySelector('.updating').style.display = 'flex';
+        var chk_radio = document.getElementsByName('typical');
+        var sel_type = '';
+        for (var i = 0; i < chk_radio.length; i++) {
+          if (chk_radio[i].checked == true) {
+            sel_type = chk_radio[i].value;
+          }
+        }
+        if (sel_type == 'standard') {
+          let previousRes = await axios({
+            method: 'get',
+            url: '/getUserLadder',
+          });
+          let updated = { ...previousRes.data.data };
+          let text = document.querySelector('.data-input');
+          let splited = text.value.split('\n');
+          for (let i = 0; i < splited.length; i++) {
+            if (
+              splited[i].includes('has') &&
+              splited[i].includes('match') &&
+              splited[i].includes('won') &&
+              !splited[i].includes(':')
+            ) {
+              let secondTask = splited[i].split(' ');
+              let last = secondTask[secondTask.length - 1];
+              if (last[last.length - 1] == '.') {
+                last = last.slice(0, last.length - 1);
+              }
+              let winner = secondTask[0].toLowerCase();
+              let loser = last.toLowerCase();
+              let winnerScore = 0;
+              let loserScore = 0;
+              if (updated[winner]) winnerScore = updated[winner];
+              else {
+                updated[winner] = 1500;
+                winnerScore = 1500;
+              }
+              if (updated[loser]) loserScore = updated[loser];
+              else {
+                updated[loser] = 1500;
+                loserScore = 1500;
+              }
+              let ubaiai = 16 + (winnerScore - loserScore) / 25;
+              if (ubaiai > 0) {
+                updated[winner] += parseInt(ubaiai);
+                updated[loser] -= parseInt(ubaiai);
+              } else {
+                updated[winner] -= parseInt(ubaiai);
+                updated[loser] += parseInt(ubaiai);
+              }
+            } else if (
+              splited[i].includes('has') &&
+              splited[i].includes('match') &&
+              splited[i].includes('lost') &&
+              !splited[i].includes(':')
+            ) {
+              let secondTask = splited[i].split(' ');
+              let last = secondTask[secondTask.length - 1];
+              if (last[last.length - 1] == '.') {
+                last = last.slice(0, last.length - 1);
+              }
+              let winner = secondTask[0].toLowerCase();
+              let loser = last.toLowerCase();
+              let winnerScore = 0;
+              let loserScore = 0;
+              if (updated[winner]) winnerScore = updated[winner];
+              else {
+                updated[winner] = 1500;
+                winnerScore = 1500;
+              }
+              if (updated[loser]) loserScore = updated[loser];
+              else {
+                updated[loser] = 1500;
+                loserScore = 1500;
+              }
+              let ubaiai = 16 + (winnerScore - loserScore) / 25;
+              if (ubaiai > 0) {
+                updated[winner] -= parseInt(ubaiai);
+                updated[loser] += parseInt(ubaiai);
+              } else {
+                updated[winner] += parseInt(ubaiai);
+                updated[loser] -= parseInt(ubaiai);
+              }
+            }
+          }
+          let res = await axios({
+            method: 'post',
+            url: '/updateLadder2',
+            data: { data: updated, log: text.value },
+          });
+          if (res.data.status == '성공') {
+            alert('점수가 업데이트 되었습니다');
+            window.location.reload();
+          } else {
+            alert('오늘 점수는 이미 업데이트 되어있습니다');
+            window.location.reload();
+          }
+        } else {
+          let previousRes = await axios({
+            method: 'get',
+            url: '/getUserLadder',
+          });
+          let updated = { ...previousRes.data.data };
+          let text = document.querySelector('.data-input');
+          let splited = text.value.split('\n');
+          for (let i = 0; i < splited.length; i++) {
+            if (
+              splited[i].includes('battleend') &&
+              splited[i].includes('win')
+            ) {
+              let secondTask = splited[i].split('|');
+
+              let winner = secondTask[3].toLowerCase();
+              let loser = secondTask[4].toLowerCase();
+              let winnerScore = 0;
+              let loserScore = 0;
+              if (updated[winner]) winnerScore = updated[winner];
+              else {
+                updated[winner] = 1500;
+                winnerScore = 1500;
+              }
+              if (updated[loser]) loserScore = updated[loser];
+              else {
+                updated[loser] = 1500;
+                loserScore = 1500;
+              }
+              let ubaiai = 16 + (winnerScore - loserScore) / 25;
+              if (ubaiai > 0) {
+                updated[winner] += parseInt(ubaiai);
+                updated[loser] -= parseInt(ubaiai);
+              } else {
+                updated[winner] -= parseInt(ubaiai);
+                updated[loser] += parseInt(ubaiai);
+              }
+            } else if (
+              splited[i].includes('battleend') &&
+              splited[i].includes('loss')
+            ) {
+              let secondTask = splited[i].split('|');
+              let winner = secondTask[3].toLowerCase();
+              let loser = secondTask[4].toLowerCase();
+              let winnerScore = 0;
+              let loserScore = 0;
+              if (updated[winner]) winnerScore = updated[winner];
+              else {
+                updated[winner] = 1500;
+                winnerScore = 1500;
+              }
+              if (updated[loser]) loserScore = updated[loser];
+              else {
+                updated[loser] = 1500;
+                loserScore = 1500;
+              }
+              let ubaiai = 16 + (winnerScore - loserScore) / 25;
+              if (ubaiai > 0) {
+                updated[winner] -= parseInt(ubaiai);
+                updated[loser] += parseInt(ubaiai);
+              } else {
+                updated[winner] += parseInt(ubaiai);
+                updated[loser] -= parseInt(ubaiai);
+              }
+            }
+          }
+          let res = await axios({
+            method: 'post',
+            url: '/updateLadder2',
             data: { data: obj, log: text.value },
           });
           if (res.data.status == '성공') {

@@ -54,11 +54,13 @@ router.get('/awards', Controller.awards);
 router.get('/ladder', Controller.ladder);
 router.get('/getCards', Controller.getCards);
 router.get('/getLadder', Controller.getLadder);
+router.get('/getUserLadder', Controller.getUserLadder);
 router.get('/replay/:id', Controller.show);
 router.get('/replayShow', Controller.replayShow);
 router.post('/search', Controller.search);
 router.post('/searchByCode', Controller.searchByCode);
 router.post('/updateLadder', Controller.updateLadder);
+router.post('/updateLadder2', Controller.updateLadder2);
 
 router.get('/getComments/:pageid', Controller.getComments);
 router.post('/commentAdd', Controller.commentAdd);
