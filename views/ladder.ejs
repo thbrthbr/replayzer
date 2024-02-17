@@ -387,12 +387,35 @@
               !splited[i].includes(':')
             ) {
               let secondTask = splited[i].split(' ');
-              let last = secondTask[secondTask.length - 1];
-              if (last[last.length - 1] == '.') {
-                last = last.slice(0, last.length - 1);
+              let frontName = '';
+              let flag = 'false';
+              let count = 0;
+              while (flag == 'false') {
+                if (secondTask[count] == 'has') {
+                  flag = 'true';
+                  break;
+                } else {
+                  frontName += ` ${secondTask[count]}`;
+                  count++;
+                }
               }
-              obj[secondTask[0].toLowerCase()] = 0;
-              obj[last.toLowerCase()] = 0;
+              let lastName = '';
+              let flag2 = 'false';
+              let count2 = 0;
+              while (secondTask.length > count2) {
+                if (secondTask[count2] == 'against') {
+                  flag2 = 'true';
+                }
+                if (secondTask[count2] !== 'against' && flag2 == 'true') {
+                  lastName += ` ${secondTask[count2]}`;
+                }
+                count2++;
+              }
+              if (lastName[lastName.length - 1] == '.') {
+                lastName = lastName.slice(0, lastName.length - 1);
+              }
+              obj[frontName.trim().toLowerCase()] = 0;
+              obj[lastName.trim().toLowerCase()] = 0;
             }
           }
           for (let i = 0; i < splited.length; i++) {
@@ -403,12 +426,35 @@
               !splited[i].includes(':')
             ) {
               let secondTask = splited[i].split(' ');
-              let last = secondTask[secondTask.length - 1];
-              if (last[last.length - 1] == '.') {
-                last = last.slice(0, last.length - 1);
+              let frontName = '';
+              let flag = 'false';
+              let count = 0;
+              while (flag == 'false') {
+                if (secondTask[count] == 'has') {
+                  flag = 'true';
+                  break;
+                } else {
+                  frontName += ` ${secondTask[count]}`;
+                  count++;
+                }
               }
-              obj[secondTask[0].toLowerCase()] += 10;
-              obj[last.toLowerCase()] -= 10;
+              let lastName = '';
+              let flag2 = 'false';
+              let count2 = 0;
+              while (secondTask.length > count2) {
+                if (secondTask[count2] == 'against') {
+                  flag2 = 'true';
+                }
+                if (secondTask[count2] !== 'against' && flag2 == 'true') {
+                  lastName += ` ${secondTask[count2]}`;
+                }
+                count2++;
+              }
+              if (lastName[lastName.length - 1] == '.') {
+                lastName = lastName.slice(0, lastName.length - 1);
+              }
+              obj[frontName.trim().toLowerCase()] += 10;
+              obj[lastName.trim().toLowerCase()] -= 10;
             } else if (
               splited[i].includes('has') &&
               splited[i].includes('match') &&
@@ -416,15 +462,38 @@
               !splited[i].includes(':')
             ) {
               let secondTask = splited[i].split(' ');
-              let last = secondTask[secondTask.length - 1];
-              if (last[last.length - 1] == '.') {
-                last = last.slice(0, last.length - 1);
+              let frontName = '';
+              let flag = 'false';
+              let count = 0;
+              while (flag == 'false') {
+                if (secondTask[count] == 'has') {
+                  flag = 'true';
+                  break;
+                } else {
+                  frontName += ` ${secondTask[count]}`;
+                  count++;
+                }
               }
-              obj[secondTask[0].toLowerCase()] -= 10;
-              obj[last.toLowerCase()] += 10;
+
+              let lastName = '';
+              let flag2 = 'false';
+              let count2 = 0;
+              while (secondTask.length > count2) {
+                if (secondTask[count2] == 'against') {
+                  flag2 = 'true';
+                }
+                if (secondTask[count2] !== 'against' && flag2 == 'true') {
+                  lastName += ` ${secondTask[count2]}`;
+                }
+                count2++;
+              }
+              if (lastName[lastName.length - 1] == '.') {
+                lastName = lastName.slice(0, lastName.length - 1);
+              }
+              obj[frontName.trim().toLowerCase()] -= 10;
+              obj[lastName.trim().toLowerCase()] += 10;
             }
           }
-          // console.log(obj);
           let res = await axios({
             method: 'post',
             url: '/updateLadder',
@@ -469,6 +538,7 @@
               obj[secondTask[4].toLowerCase()] += 10;
             }
           }
+          console.log(obj);
           let res = await axios({
             method: 'post',
             url: '/updateLadder',
@@ -503,6 +573,7 @@
           let updated = { ...previousRes.data.data };
           let text = document.querySelector('.data-input');
           let splited = text.value.split('\n');
+          console.log(previousRes.data.data);
           for (let i = 0; i < splited.length; i++) {
             if (
               splited[i].includes('has') &&
@@ -510,13 +581,13 @@
               splited[i].includes('won') &&
               !splited[i].includes(':')
             ) {
-              let secondTask = splited[i].split(' ');
-              let last = secondTask[secondTask.length - 1];
-              if (last[last.length - 1] == '.') {
-                last = last.slice(0, last.length - 1);
-              }
-              let winner = secondTask[0].toLowerCase();
-              let loser = last.toLowerCase();
+              let frontOne = splited[i].split('has')[0];
+              let backOne = splited[i].split('against')[1];
+              backOne = backOne.split('.')[0];
+              backOne = backOne.trim();
+              frontOne = frontOne.trim();
+              let winner = frontOne.toLowerCase();
+              let loser = backOne.toLowerCase();
               let winnerScore = 0;
               let loserScore = 0;
               if (updated[winner]) winnerScore = updated[winner];
@@ -543,13 +614,13 @@
               splited[i].includes('lost') &&
               !splited[i].includes(':')
             ) {
-              let secondTask = splited[i].split(' ');
-              let last = secondTask[secondTask.length - 1];
-              if (last[last.length - 1] == '.') {
-                last = last.slice(0, last.length - 1);
-              }
-              let winner = secondTask[0].toLowerCase();
-              let loser = last.toLowerCase();
+              let frontOne = splited[i].split('has')[0];
+              let backOne = splited[i].split('against')[1];
+              backOne = backOne.split('.')[0];
+              backOne = backOne.trim();
+              frontOne = frontOne.trim();
+              let winner = frontOne.toLowerCase();
+              let loser = backOne.toLowerCase();
               let winnerScore = 0;
               let loserScore = 0;
               if (updated[winner]) winnerScore = updated[winner];
@@ -572,6 +643,7 @@
               }
             }
           }
+          console.log(updated);
           let res = await axios({
             method: 'post',
             url: '/updateLadder2',
