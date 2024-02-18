@@ -16,6 +16,18 @@ const Ladder = (sequelize) => {
       type: DataTypes.FLOAT,
       allowNull: false,
     },
+    decay: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    lastUpdate: {
+      type: DataTypes.STRING(200),
+      allowNull: false,
+    },
+    decayDate: {
+      type: DataTypes.STRING(200),
+      allowNull: false,
+    },
   });
   return Ladder;
 };

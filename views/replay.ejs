@@ -23,12 +23,12 @@
         width: 100%;
         height: 75vh;
         background-color: white;
-        border: none; 
+        border: none;
       }
-      .inputWrapper{
+      .inputWrapper {
         display: flex;
       }
-      #eachComment{
+      #eachComment {
         display: flex;
         flex-wrap: wrap;
         align-items: center;
@@ -39,10 +39,10 @@
         /* margin: 10px; */
         padding: 5px;
       }
-      #nickLine{
+      #nickLine {
         font-size: 30px;
       }
-      #dateLine{
+      #dateLine {
         margin-top: 5px;
         font-size: 15px;
         font-style: italic;
@@ -53,27 +53,27 @@
       }
       #content {
         border: none;
-        padding: 0px; 
-        height: 100px; 
-        width: 100%; 
+        padding: 0px;
+        height: 100px;
+        width: 100%;
         resize: none;
       }
-      #content:focus{
-        outline:none;
+      #content:focus {
+        outline: none;
       }
 
-      #comment-button{
-        width:20%;
+      #comment-button {
+        width: 20%;
         background-color: white;
         cursor: pointer;
         border-radius: 5px;
       }
-      #comment-button:hover{
+      #comment-button:hover {
         color: white;
         background-color: #d4e9ed;
       }
       .font-sizer {
-        font-size : 50px;
+        font-size: 50px;
       }
     </style>
   </head>
@@ -86,107 +86,138 @@
             style="width: 120px; height: 100px"
           />
         </a>
-      <div class="box"><iframe src='/replayShow' class="cinema"></iframe></div>
-    </div>
-    <br/>
-    <div><h1 id="commentNum" style="color: white">댓글</h1></div>
-    <ul style="margin: 0px; padding: 0px; list-style: none" id="commentList"></ul>
-    <div style="width: 100%; margin-top: 20px; padding: 5px">
-      <div style="width: 100%; display: flex; justify-content: space-between;" class="inputWrapper">
-        <input class="font-sizer" id="nick" style="width:40%" placeholder="닉네임" type="text">
-        <input class="font-sizer" id="pw" style="width:40%" placeholder="****" type="password">
-        <button class="font-sizer" id="comment-button" onclick="comment()">등록</button>
       </div>
-      <textarea class="font-sizer" style="min-height: 120px;" id="content"></textarea>
+      <div class="box"><iframe src="/replayShow" class="cinema"></iframe></div>
+    </div>
+    <br />
+    <div><h1 id="commentNum" style="color: white">댓글</h1></div>
+    <ul
+      style="margin: 0px; padding: 0px; list-style: none"
+      id="commentList"
+    ></ul>
+    <div style="width: 100%; margin-top: 20px; padding: 5px">
+      <div
+        style="width: 100%; display: flex; justify-content: space-between"
+        class="inputWrapper"
+      >
+        <input
+          class="font-sizer"
+          id="nick"
+          style="width: 40%"
+          placeholder="닉네임"
+          type="text"
+        />
+        <input
+          class="font-sizer"
+          id="pw"
+          style="width: 40%"
+          placeholder="****"
+          type="password"
+        />
+        <button class="font-sizer" id="comment-button" onclick="comment()">
+          등록
+        </button>
+      </div>
+      <textarea
+        class="font-sizer"
+        style="min-height: 120px"
+        id="content"
+      ></textarea>
     </div>
     <script>
       axios({
-        method: "get",
-        url : `/getComments/${window.location.pathname.split("/")[2]}`
-      }).then((res)=> {
+        method: 'get',
+        url: `/getComments/${window.location.pathname.split('/')[2]}`,
+      }).then((res) => {
         console.log(res);
-        let commentNum = document.querySelector("#commentNum");
-        commentNum.innerText = commentNum.innerText + " " + res.data.data.length;
-        let commentList = document.querySelector("#commentList");
-        for(let i = 0; i < res.data.data.length; i++){
-          let li = document.createElement("li");
-          let liner = document.createElement("hr");
-          let box = document.createElement("div");
-          let nickLine = document.createElement("div");
-          let dateLine = document.createElement("span");
-          let deleter = document.createElement("span")
-          nickLine.id = "nickLine";
-          dateLine.id = "dateLine";
-          deleter.id = "deleter";
-          let contentLine = document.createElement("div");
+        let commentNum = document.querySelector('#commentNum');
+        commentNum.innerText =
+          commentNum.innerText + ' ' + res.data.data.length;
+        let commentList = document.querySelector('#commentList');
+        for (let i = 0; i < res.data.data.length; i++) {
+          let li = document.createElement('li');
+          let liner = document.createElement('hr');
+          let box = document.createElement('div');
+          let nickLine = document.createElement('div');
+          let dateLine = document.createElement('span');
+          let deleter = document.createElement('span');
+          nickLine.id = 'nickLine';
+          dateLine.id = 'dateLine';
+          deleter.id = 'deleter';
+          let contentLine = document.createElement('div');
           contentLine.style.cssText = `
             padding: 5px;
-          `
+          `;
           nickLine.innerText = res.data.data[i].nick;
           contentLine.innerText = res.data.data[i].content;
           let timeFixer = +res.data.data[i].createdAt.slice(11, 13);
-          timeFixer = "" + ((timeFixer+9) % 24);
-          if(timeFixer.length == 1) timeFixer = "0" + timeFixer;
+          timeFixer = '' + ((timeFixer + 9) % 24);
+          if (timeFixer.length == 1) timeFixer = '0' + timeFixer;
           dateLine.style.cssText = `
             padding: 7px;
-          `
-          dateLine.innerText = res.data.data[i].createdAt.slice(0, 10) + " " + timeFixer + res.data.data[i].createdAt.slice(13, 16) + " ";
-          deleter.innerText = "삭제";
+          `;
+          dateLine.innerText =
+            res.data.data[i].createdAt.slice(0, 10) +
+            ' ' +
+            timeFixer +
+            res.data.data[i].createdAt.slice(13, 16) +
+            ' ';
+          deleter.innerText = '삭제';
           deleter.onclick = () => {
-            commentDelete(res.data.data[i].id ,res.data.data[i].pw)
-          }
+            commentDelete(res.data.data[i].id, res.data.data[i].pw);
+          };
           box.appendChild(nickLine);
           box.appendChild(contentLine);
           box.appendChild(dateLine);
           box.appendChild(deleter);
           li.appendChild(box);
-          li.id = "eachComment";
+          li.id = 'eachComment';
           commentList.appendChild(li);
-          if(i < res.data.data.length - 1){
+          if (i < res.data.data.length - 1) {
             commentList.appendChild(liner);
           }
         }
-      })
+      });
 
       const comment = async () => {
-        let nick = document.querySelector("#nick");
-        let pw = document.querySelector("#pw");
-        let content = document.querySelector("#content");
-        if(content.value){
+        let nick = document.querySelector('#nick');
+        let pw = document.querySelector('#pw');
+        let content = document.querySelector('#content');
+        if (content.value) {
           let res = await axios({
-            method: "post",
+            method: 'post',
             url: '/commentAdd',
             data: {
-              nick: nick.value ? nick.value : "ㅇㅇ", 
-              pw : pw.value ? pw.value : "0000", 
+              nick: nick.value ? nick.value : 'ㅇㅇ',
+              pw: pw.value ? pw.value : '0000',
               content: content.value,
-              pageid: window.location.pathname.split("/")[2]
-            }
-          })
-          if(res.data.status == "성공") window.location.reload();
-        }else{
-          alert("내용을 입력해주세요");
+              pageid: window.location.pathname.split('/')[2],
+            },
+          });
+          if (res.data.status == '성공') window.location.reload();
+        } else {
+          alert('내용을 입력해주세요');
         }
-      }
+      };
 
       const commentDelete = async (id, pw) => {
-        let insertedPW = window.prompt("비밀번호를 입력해주세요");
-        if(insertedPW == pw){
+        let insertedPW = window.prompt('비밀번호를 입력해주세요');
+        if (insertedPW == pw) {
           let res = await axios({
-            method: "post",
-            url: "/commentSub",
+            method: 'post',
+            url: '/commentSub',
             data: {
-              commentId : id
-            }
-          })
-          if(res.data.status == "성공"){
-            alert("댓글을 삭제했습니다");
+              commentId: id,
+            },
+          });
+          if (res.data.status == '성공') {
+            alert('댓글을 삭제했습니다');
             window.location.reload();
           }
-        }else{
-          alert("비밀번호가 맞지 않습니다")
+        } else {
+          alert('비밀번호가 맞지 않습니다');
         }
-      }
+      };
     </script>
   </body>
 </html>

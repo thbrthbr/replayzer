@@ -290,7 +290,7 @@
       axios({
         method: 'get',
         url: '/getLadder',
-      }).then((res) => {
+      }).then(async (res) => {
         let table = document.querySelector('.ladder-table');
         let order = 0;
         let present = 0;
@@ -338,6 +338,13 @@
         } else {
           dater.innerText += ' not yet';
         }
+        // 2월 23일에 해방 cmain쪽도 해방하기
+        //@@@@@@@@@@@@@@
+        // let res2 = await axios({
+        //   method: 'post',
+        //   url: '/decay',
+        //   data: [],
+        // });
       });
 
       const unlock = () => {
@@ -538,7 +545,7 @@
               obj[secondTask[4].toLowerCase()] += 10;
             }
           }
-          console.log(obj);
+          // console.log(obj);
           let res = await axios({
             method: 'post',
             url: '/updateLadder',
@@ -573,7 +580,7 @@
           let updated = { ...previousRes.data.data };
           let text = document.querySelector('.data-input');
           let splited = text.value.split('\n');
-          console.log(previousRes.data.data);
+          // console.log(previousRes.data.data);
           for (let i = 0; i < splited.length; i++) {
             if (
               splited[i].includes('has') &&
@@ -602,11 +609,11 @@
               }
               let ubaiai = 16 + (winnerScore - loserScore) / 25;
               if (ubaiai > 0) {
-                updated[winner] += parseInt(ubaiai);
-                updated[loser] -= parseInt(ubaiai);
+                updated[winner] += ubaiai.toFixed(3);
+                updated[loser] -= ubaiai.toFixed(3);
               } else {
-                updated[winner] -= parseInt(ubaiai);
-                updated[loser] += parseInt(ubaiai);
+                updated[winner] -= ubaiai.toFixed(3);
+                updated[loser] += ubaiai.toFixed(3);
               }
             } else if (
               splited[i].includes('has') &&
@@ -635,15 +642,15 @@
               }
               let ubaiai = 16 + (winnerScore - loserScore) / 25;
               if (ubaiai > 0) {
-                updated[winner] -= parseInt(ubaiai);
-                updated[loser] += parseInt(ubaiai);
+                updated[winner] -= ubaiai.toFixed(3);
+                updated[loser] += ubaiai.toFixed(3);
               } else {
-                updated[winner] += parseInt(ubaiai);
-                updated[loser] -= parseInt(ubaiai);
+                updated[winner] += ubaiai.toFixed(3);
+                updated[loser] -= ubaiai.toFixed(3);
               }
             }
           }
-          console.log(updated);
+          // console.log(updated);
           let res = await axios({
             method: 'post',
             url: '/updateLadder2',

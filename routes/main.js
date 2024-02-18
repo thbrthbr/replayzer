@@ -49,6 +49,7 @@ router.post('/card_upload', upload2.single('card-upload'), Controller.upload2);
 router.post('/replay_delete', Controller.remove);
 
 // router.post('/temp', Controller.temp);
+// router.get('/test', Controller.test);
 
 router.get('/awards', Controller.awards);
 router.get('/ladder', Controller.ladder);
@@ -61,6 +62,8 @@ router.post('/search', Controller.search);
 router.post('/searchByCode', Controller.searchByCode);
 router.post('/updateLadder', Controller.updateLadder);
 router.post('/updateLadder2', Controller.updateLadder2);
+
+router.post('/decay', Controller.decay);
 
 router.get('/getComments/:pageid', Controller.getComments);
 router.post('/commentAdd', Controller.commentAdd);
