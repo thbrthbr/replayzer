@@ -349,75 +349,82 @@ exports.updateLadder = async (req, res) => {
   res.send({ status: '성공' });
 };
 exports.updateLadder2 = async (req, res) => {
-  let pair = Object.entries(req.body.data);
-  for (let i = 0; i < pair.length; i++) {
-    let result = await Ladder.findOne({
-      where: {
-        user: pair[i][0],
-      },
-    });
-    if (result) {
-      let dd = String(new Date().getDate());
-      let mm = String(new Date().getMonth() + 1).padStart(2, '0');
-      let yy = String(new Date().getFullYear());
-      await Ladder.update(
-        {
+  try {
+    let pair = Object.entries(req.body.data);
+    let tempDate = new Date();
+    let dd = String(tempDate.getDate());
+    let mm = String(tempDate.getMonth() + 1).padStart(2, '0');
+    let yy = String(tempDate.getFullYear());
+    for (let i = 0; i < pair.length; i++) {
+      let result = await Ladder.findOne({
+        where: {
           user: pair[i][0],
-          score: pair[i][1],
+        },
+      });
+      if (result) {
+        await Ladder.update(
+          {
+            user: pair[i][0],
+            score: +pair[i][1].toFixed(3),
+            decay: 0,
+            lastUpdate: `${yy}-${mm}-${dd}`,
+            decayDate: `${yy}-${mm}-${dd}`,
+          },
+          {
+            where: {
+              user: pair[i][0],
+            },
+          },
+        );
+      } else {
+        await Ladder.create({
+          user: pair[i][0],
+          score: +pair[i][1].toFixed(3),
           decay: 0,
           lastUpdate: `${yy}-${mm}-${dd}`,
           decayDate: `${yy}-${mm}-${dd}`,
-        },
-        {
-          where: {
-            user: pair[i][0],
-          },
-        },
-      );
-    } else {
-      let dd = String(new Date().getDate());
-      let mm = String(new Date().getMonth() + 1).padStart(2, '0');
-      let yy = String(new Date().getFullYear());
-      await Ladder.create({
-        user: pair[i][0],
-        score: pair[i][1],
-        decay: 0,
-        lastUpdate: `${yy}-${mm}-${dd}`,
-        decayDate: `${yy}-${mm}-${dd}`,
-      });
+        });
+      }
     }
+    res.send({ status: '성공' });
+  } catch (e) {
+    res.send({ status: '실패' });
   }
-  res.send({ status: '성공' });
 };
 
 exports.decay = async (req, res) => {
-  let dd = String(new Date().getDate());
-  let mm = String(new Date().getMonth() + 1).padStart(2, '0');
-  let yy = String(new Date().getFullYear());
-  let today = +`${yy}${mm}${dd}`;
-  let ladder = await Ladder.findAll();
-  for (let i = 0; i < ladder.length; i++) {
-    let userLastUpdate = +ladder[i].dataValues.lastUpdate.split('-').join('');
-    let userLastDecay = +ladder[i].dataValues.decayDate.split('-').join('');
-    console.log(today);
-    console.log(userLastUpdate);
-    if (today - userLastUpdate >= 3 && userLastDecay !== today) {
-      let dacayCount = today - userLastUpdate;
-      let dacayAmount = dacayCount * 6;
-      let perUser = {
-        decay: dacayCount - 2,
-        score: ladder[i].dataValues.score - dacayAmount,
-        decayDate: `${yy}-${mm}-${dd}`,
-      };
-      console.log(perUser);
-      // 2월 23일에 해방
-      // let user = await Ladder.update(perUser, {
-      //   where: {
-      //     user: pair[i][0],
-      //   },
-      // });
+  try {
+    let tempDate = new Date();
+    let dd = String(tempDate.getDate());
+    let mm = String(tempDate.getMonth() + 1).padStart(2, '0');
+    let yy = String(tempDate.getFullYear());
+    let today = +`${yy}${mm}${dd}`;
+    let ladder = await Ladder.findAll();
+    for (let i = 0; i < ladder.length; i++) {
+      let userLastUpdate = +ladder[i].dataValues.lastUpdate.split('-').join('');
+      let userLastDecay = +ladder[i].dataValues.decayDate.split('-').join('');
+      // console.log(today);
+      // console.log(userLastUpdate);
+      if (today - userLastUpdate >= 3 && userLastDecay !== today) {
+        let dacayCount = today - userLastUpdate;
+        let dacayAmount = dacayCount * 6;
+        let perUser = {
+          decay: dacayCount - 2,
+          score: ladder[i].dataValues.score - dacayAmount,
+          decayDate: `${yy}-${mm}-${dd}`,
+        };
+        // console.log(perUser);
+        // 2월 23일에 해방
+        let user = await Ladder.update(perUser, {
+          where: {
+            user: ladder[i].dataValues.user,
+          },
+        });
+      }
     }
+    // console.log(ladder);
+    res.send({ status: '성공' });
+  } catch (e) {
+    res.send({ status: '실패' });
   }
-  // console.log(ladder);
-  res.send({ status: '성공' });
 };
