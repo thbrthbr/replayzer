@@ -399,18 +399,21 @@ exports.decay = async (req, res) => {
     let mm = String(tempDate.getMonth() + 1).padStart(2, '0');
     let yy = String(tempDate.getFullYear());
     let today = +`${yy}${mm}${dd}`;
+    let todayString = `${yy}-${mm}-${dd}`;
     let ladder = await Ladder.findAll();
     for (let i = 0; i < ladder.length; i++) {
       let userLastUpdate = +ladder[i].dataValues.lastUpdate.split('-').join('');
       let userLastDecay = +ladder[i].dataValues.decayDate.split('-').join('');
-      // console.log(today);
-      // console.log(userLastUpdate);
+      const date1 = new Date(todayString);
+      const date2 = new Date(ladder[i].dataValues.lastUpdate);
+      const timeDifference = Math.abs(date1 - date2);
+      const daysDifference = timeDifference / (1000 * 60 * 60 * 24);
+      console.log(daysDifference);
       if (today - userLastUpdate >= 3 && userLastDecay !== today) {
-        let dacayCount = today - userLastUpdate;
-        let dacayAmount = dacayCount * 6;
+        let decayAmount2 = (ladder[i].dataValues.decay + 3) * 6;
         let perUser = {
-          decay: dacayCount - 2,
-          score: ladder[i].dataValues.score - dacayAmount,
+          decay: ladder[i].dataValues.decay++,
+          score: ladder[i].dataValues.score - decayAmount2,
           decayDate: `${yy}-${mm}-${dd}`,
         };
         // console.log(perUser);
