@@ -407,10 +407,11 @@ exports.decay = async (req, res) => {
       const date2 = new Date(ladder[i].dataValues.lastUpdate);
       const timeDifference = Math.abs(date1 - date2);
       const daysDifference = timeDifference / (1000 * 60 * 60 * 24);
+      // console.log(daysDifference);
       if (daysDifference >= 3 && userLastDecay !== today) {
         let decayAmount2 = (ladder[i].dataValues.decay + 3) * 6;
         let perUser = {
-          decay: ladder[i].dataValues.decay++,
+          decay: ladder[i].dataValues.decay + 1,
           score: ladder[i].dataValues.score - decayAmount2,
           decayDate: `${yy}-${mm}-${dd}`,
         };

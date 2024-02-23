@@ -589,13 +589,12 @@
               splited[i].includes('won') &&
               !splited[i].includes(':')
             ) {
-              let frontOne = splited[i].split('has')[0];
-              let backOne = splited[i].split('against')[1];
-              backOne = backOne.split('.')[0];
-              backOne = backOne.trim();
-              frontOne = frontOne.trim();
-              let winner = frontOne.toLowerCase();
-              let loser = backOne.toLowerCase();
+              let winner = splited[i].split('has')[0].trim().toLowerCase();
+              let loser = splited[i]
+                .split('against')[1]
+                .split('.')[0]
+                .trim()
+                .toLowerCase();
               let winnerScore = 0;
               let loserScore = 0;
               if (updated[winner]) winnerScore = updated[winner];
@@ -625,13 +624,12 @@
               splited[i].includes('lost') &&
               !splited[i].includes(':')
             ) {
-              let frontOne = splited[i].split('has')[0];
-              let backOne = splited[i].split('against')[1];
-              backOne = backOne.split('.')[0];
-              backOne = backOne.trim();
-              frontOne = frontOne.trim();
-              let winner = frontOne.toLowerCase();
-              let loser = backOne.toLowerCase();
+              let winner = splited[i].split('has')[0].trim().toLowerCase();
+              let loser = splited[i]
+                .split('against')[1]
+                .split('.')[0]
+                .trim()
+                .toLowerCase();
               let winnerScore = 0;
               let loserScore = 0;
               if (updated[winner]) winnerScore = updated[winner];
@@ -743,7 +741,7 @@
           let res = await axios({
             method: 'post',
             url: '/updateLadder2',
-            data: { data: obj, log: text.value },
+            data: { data: updated, log: text.value },
           });
           if (res.data.status == '성공') {
             alert('점수가 업데이트 되었습니다');
