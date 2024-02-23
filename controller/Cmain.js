@@ -402,23 +402,19 @@ exports.decay = async (req, res) => {
     let todayString = `${yy}-${mm}-${dd}`;
     let ladder = await Ladder.findAll();
     for (let i = 0; i < ladder.length; i++) {
-      let userLastUpdate = +ladder[i].dataValues.lastUpdate.split('-').join('');
       let userLastDecay = +ladder[i].dataValues.decayDate.split('-').join('');
       const date1 = new Date(todayString);
       const date2 = new Date(ladder[i].dataValues.lastUpdate);
       const timeDifference = Math.abs(date1 - date2);
       const daysDifference = timeDifference / (1000 * 60 * 60 * 24);
-      console.log(daysDifference);
-      if (today - userLastUpdate >= 3 && userLastDecay !== today) {
+      if (daysDifference >= 3 && userLastDecay !== today) {
         let decayAmount2 = (ladder[i].dataValues.decay + 3) * 6;
         let perUser = {
           decay: ladder[i].dataValues.decay++,
           score: ladder[i].dataValues.score - decayAmount2,
           decayDate: `${yy}-${mm}-${dd}`,
         };
-        // console.log(perUser);
-        // 2월 23일에 해방
-        let user = await Ladder.update(perUser, {
+        await Ladder.update(perUser, {
           where: {
             user: ladder[i].dataValues.user,
           },

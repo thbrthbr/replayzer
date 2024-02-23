@@ -308,12 +308,12 @@
             carry++;
             rankOrder.innerText = order;
             user.innerText = sorted[i].user;
-            score.innerText = sorted[i].score;
+            score.innerText = String(sorted[i].score).padEnd(8, '0');
           } else {
             order += 1;
             rankOrder.innerText = order + carry;
             user.innerText = sorted[i].user;
-            score.innerText = sorted[i].score;
+            score.innerText = String(sorted[i].score).padEnd(8, '0');
             present = sorted[i].score;
             order = order + carry;
             carry = 0;
