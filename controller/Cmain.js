@@ -362,20 +362,24 @@ exports.updateLadder2 = async (req, res) => {
         },
       });
       if (result) {
-        await Ladder.update(
-          {
-            user: pair[i][0],
-            score: +pair[i][1].toFixed(3),
-            decay: 0,
-            lastUpdate: `${yy}-${mm}-${dd}`,
-            decayDate: `${yy}-${mm}-${dd}`,
-          },
-          {
-            where: {
+        let currentScore = result.score;
+        let updatedScore = +pair[i][1].toFixed(3);
+        if (updatedScore !== currentScore) {
+          await Ladder.update(
+            {
               user: pair[i][0],
+              score: updatedScore,
+              decay: 0,
+              lastUpdate: `${yy}-${mm}-${dd}`,
+              decayDate: `${yy}-${mm}-${dd}`,
             },
-          },
-        );
+            {
+              where: {
+                user: pair[i][0],
+              },
+            },
+          );
+        }
       } else {
         await Ladder.create({
           user: pair[i][0],
@@ -388,6 +392,7 @@ exports.updateLadder2 = async (req, res) => {
     }
     res.send({ status: '성공' });
   } catch (e) {
+    console.log(e);
     res.send({ status: '실패' });
   }
 };
@@ -408,7 +413,7 @@ exports.decay = async (req, res) => {
       const timeDifference = Math.abs(date1 - date2);
       const daysDifference = timeDifference / (1000 * 60 * 60 * 24);
       // console.log(daysDifference);
-      if (daysDifference >= 3 && userLastDecay !== today) {
+      if (daysDifference >= 4 && userLastDecay !== today) {
         let decayAmount2 = (ladder[i].dataValues.decay + 3) * 6;
         let perUser = {
           decay: ladder[i].dataValues.decay + 1,
