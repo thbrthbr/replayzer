@@ -362,24 +362,20 @@ exports.updateLadder2 = async (req, res) => {
         },
       });
       if (result) {
-        let currentScore = result.score;
-        let updatedScore = +pair[i][1].toFixed(3);
-        if (updatedScore !== currentScore) {
-          await Ladder.update(
-            {
+        await Ladder.update(
+          {
+            user: pair[i][0],
+            score: updatedScore,
+            decay: 0,
+            lastUpdate: `${yy}-${mm}-${dd}`,
+            decayDate: `${yy}-${mm}-${dd}`,
+          },
+          {
+            where: {
               user: pair[i][0],
-              score: updatedScore,
-              decay: 0,
-              lastUpdate: `${yy}-${mm}-${dd}`,
-              decayDate: `${yy}-${mm}-${dd}`,
             },
-            {
-              where: {
-                user: pair[i][0],
-              },
-            },
-          );
-        }
+          },
+        );
       } else {
         await Ladder.create({
           user: pair[i][0],

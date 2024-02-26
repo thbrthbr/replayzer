@@ -348,8 +348,8 @@
         } else {
           dater.innerText += ' not yet';
         }
-        // 2월 23일에 해방 cmain쪽도 해방하기
-        //@@@@@@@@@@@@@@
+        let curtain = document.querySelector('.updating');
+        curtain.style.height = document.documentElement.scrollHeight + 'px';
         let res2 = await axios({
           method: 'post',
           url: '/decay',
@@ -588,6 +588,7 @@
             url: '/getUserLadder',
           });
           let updated = { ...previousRes.data.data };
+          let updatedUsersToday = {};
           // console.log(updated);
           let text = document.querySelector('.data-input');
           let splited = text.value.split('\n');
@@ -627,6 +628,8 @@
                 updated[winner] -= ubaiai;
                 updated[loser] += ubaiai;
               }
+              updatedUsersToday[winner] = updated[winner];
+              updatedUsersToday[loser] = updated[loser];
               // console.log(updated);
             } else if (
               splited[i].includes('has') &&
@@ -663,13 +666,15 @@
                 updated[loser] -= ubaiai;
               }
               // console.log(updated);
+              updatedUsersToday[winner] = updated[winner];
+              updatedUsersToday[loser] = updated[loser];
             }
           }
           // console.log(updated);
           let res = await axios({
             method: 'post',
             url: '/updateLadder2',
-            data: { data: updated, log: text.value },
+            data: { data: updatedUsersToday, log: text.value },
           });
           if (res.data.status == '성공') {
             alert('점수가 업데이트 되었습니다');
@@ -685,6 +690,7 @@
             url: '/getUserLadder',
           });
           let updated = { ...previousRes.data.data };
+          let updatedUsersToday = {};
           let text = document.querySelector('.data-input');
           let splited = text.value.split('\n');
           for (let i = 0; i < splited.length; i++) {
@@ -717,6 +723,8 @@
                 updated[winner] -= ubaiai;
                 updated[loser] += ubaiai;
               }
+              updatedUsersToday[winner] = updated[winner];
+              updatedUsersToday[loser] = updated[loser];
             } else if (
               splited[i].includes('battleend') &&
               splited[i].includes('loss')
@@ -745,13 +753,15 @@
                 updated[winner] += ubaiai;
                 updated[loser] -= ubaiai;
               }
+              updatedUsersToday[winner] = updated[winner];
+              updatedUsersToday[loser] = updated[loser];
             }
           }
           // console.log(updated);
           let res = await axios({
             method: 'post',
             url: '/updateLadder2',
-            data: { data: updated, log: text.value },
+            data: { data: updatedUsersToday, log: text.value },
           });
           if (res.data.status == '성공') {
             alert('점수가 업데이트 되었습니다');
