@@ -351,10 +351,13 @@ exports.updateLadder = async (req, res) => {
 exports.updateLadder2 = async (req, res) => {
   try {
     let pair = Object.entries(req.body.data);
-    let tempDate = new Date();
-    let dd = String(tempDate.getDate());
-    let mm = String(tempDate.getMonth() + 1).padStart(2, '0');
-    let yy = String(tempDate.getFullYear());
+    const utcDate = new Date();
+    const koreaTime = new Date(utcDate.getTime() + 9 * 60 * 60 * 1000);
+    const koreaTimeString = koreaTime
+      .toISOString()
+      .replace('T', ' ')
+      .replace('.000Z', '');
+    let todayString = koreaTimeString.split(' ')[0];
     for (let i = 0; i < pair.length; i++) {
       let result = await Ladder.findOne({
         where: {
@@ -367,8 +370,8 @@ exports.updateLadder2 = async (req, res) => {
             user: pair[i][0],
             score: +pair[i][1].toFixed(3),
             decay: 0,
-            lastUpdate: `${yy}-${mm}-${dd}`,
-            decayDate: `${yy}-${mm}-${dd}`,
+            lastUpdate: todayString,
+            decayDate: todayString,
           },
           {
             where: {
@@ -381,8 +384,8 @@ exports.updateLadder2 = async (req, res) => {
           user: pair[i][0],
           score: +pair[i][1].toFixed(3),
           decay: 0,
-          lastUpdate: `${yy}-${mm}-${dd}`,
-          decayDate: `${yy}-${mm}-${dd}`,
+          lastUpdate: todayString,
+          decayDate: todayString,
         });
       }
     }
@@ -395,35 +398,37 @@ exports.updateLadder2 = async (req, res) => {
 
 exports.decay = async (req, res) => {
   try {
-    let tempDate = new Date();
-    let dd = String(tempDate.getDate());
-    let mm = String(tempDate.getMonth() + 1).padStart(2, '0');
-    let yy = String(tempDate.getFullYear());
-    let today = +`${yy}${mm}${dd}`;
-    let todayString = `${yy}-${mm}-${dd}`;
+    const utcDate = new Date();
+    const koreaTime = new Date(utcDate.getTime() + 9 * 60 * 60 * 1000);
+    const koreaTimeString = koreaTime
+      .toISOString()
+      .replace('T', ' ')
+      .replace('.000Z', '');
+    let todayString = koreaTimeString.split(' ')[0];
     let ladder = await Ladder.findAll();
     for (let i = 0; i < ladder.length; i++) {
-      let userLastDecay = +ladder[i].dataValues.decayDate.split('-').join('');
+      let userLastDecay = ladder[i].dataValues.decayDate;
       const date1 = new Date(todayString);
       const date2 = new Date(ladder[i].dataValues.lastUpdate);
       const timeDifference = Math.abs(date1 - date2);
       const daysDifference = timeDifference / (1000 * 60 * 60 * 24);
       // console.log(daysDifference);
-      if (daysDifference >= 4 && userLastDecay !== today) {
+      if (daysDifference >= 4 && userLastDecay !== todayString) {
         let decayAmount2 = (ladder[i].dataValues.decay + 3) * 6;
-        let perUser = {
-          decay: ladder[i].dataValues.decay + 1,
-          score: ladder[i].dataValues.score - decayAmount2,
-          decayDate: `${yy}-${mm}-${dd}`,
-        };
-        await Ladder.update(perUser, {
-          where: {
-            user: ladder[i].dataValues.user,
+        await Ladder.update(
+          {
+            decay: ladder[i].dataValues.decay + 1,
+            score: ladder[i].dataValues.score - decayAmount2,
+            decayDate: todayString,
           },
-        });
+          {
+            where: {
+              user: ladder[i].dataValues.user,
+            },
+          },
+        );
       }
     }
-    // console.log(ladder);
     res.send({ status: '성공' });
   } catch (e) {
     res.send({ status: '실패' });

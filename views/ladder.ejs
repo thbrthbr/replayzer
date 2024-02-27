@@ -349,7 +349,8 @@
           dater.innerText += ' not yet';
         }
         let curtain = document.querySelector('.updating');
-        curtain.style.height = document.documentElement.scrollHeight + 'px';
+        curtain.style.height =
+          document.documentElement.scrollHeight + 100 + 'px';
         let res2 = await axios({
           method: 'post',
           url: '/decay',
