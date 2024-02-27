@@ -365,7 +365,7 @@ exports.updateLadder2 = async (req, res) => {
         await Ladder.update(
           {
             user: pair[i][0],
-            score: updatedScore,
+            score: +pair[i][1].toFixed(3),
             decay: 0,
             lastUpdate: `${yy}-${mm}-${dd}`,
             decayDate: `${yy}-${mm}-${dd}`,

@@ -618,15 +618,20 @@
                 updated[loser] = 1500;
                 loserScore = 1500;
               }
-              let ubaiai = 16 + (winnerScore - loserScore) / 25;
+              let ubaiai = 16 + (loserScore - winnerScore) / 25;
               ubaiai = Number(ubaiai.toFixed(3));
               // console.log(ubaiai);
-              if (ubaiai > 0) {
-                updated[winner] += ubaiai;
-                updated[loser] -= ubaiai;
+              if (ubaiai <= 0) {
+                updated[winner] += 1;
+                updated[loser] -= 1;
               } else {
-                updated[winner] -= ubaiai;
-                updated[loser] += ubaiai;
+                if (ubaiai > 32) {
+                  updated[winner] += 32;
+                  updated[loser] -= 32;
+                } else {
+                  updated[winner] += ubaiai;
+                  updated[loser] -= ubaiai;
+                }
               }
               updatedUsersToday[winner] = updated[winner];
               updatedUsersToday[loser] = updated[loser];
@@ -637,8 +642,8 @@
               splited[i].includes('lost') &&
               !splited[i].includes(':')
             ) {
-              let winner = splited[i].split('has')[0].trim().toLowerCase();
-              let loser = splited[i]
+              let loser = splited[i].split('has')[0].trim().toLowerCase();
+              let winner = splited[i]
                 .split('against')[1]
                 .split('.')[0]
                 .trim()
@@ -655,15 +660,20 @@
                 updated[loser] = 1500;
                 loserScore = 1500;
               }
-              let ubaiai = 16 + (winnerScore - loserScore) / 25;
+              let ubaiai = 16 + (loserScore - winnerScore) / 25;
               ubaiai = Number(ubaiai.toFixed(3));
               // console.log(ubaiai);
-              if (ubaiai > 0) {
-                updated[winner] -= ubaiai;
-                updated[loser] += ubaiai;
+              if (ubaiai <= 0) {
+                updated[winner] += 1;
+                updated[loser] -= 1;
               } else {
-                updated[winner] += ubaiai;
-                updated[loser] -= ubaiai;
+                if (ubaiai > 32) {
+                  updated[winner] += 32;
+                  updated[loser] -= 32;
+                } else {
+                  updated[winner] += ubaiai;
+                  updated[loser] -= ubaiai;
+                }
               }
               // console.log(updated);
               updatedUsersToday[winner] = updated[winner];
@@ -678,7 +688,7 @@
           });
           if (res.data.status == '성공') {
             alert('점수가 업데이트 되었습니다');
-            window.location.reload();
+            // window.location.reload();
           } else {
             alert('점수가 업데이트에 실패하였습니다');
             // alert('오늘 점수는 이미 업데이트 되어있습니다');
@@ -690,6 +700,7 @@
             url: '/getUserLadder',
           });
           let updated = { ...previousRes.data.data };
+          // console.log(updated);
           let updatedUsersToday = {};
           let text = document.querySelector('.data-input');
           let splited = text.value.split('\n');
@@ -699,7 +710,6 @@
               splited[i].includes('win')
             ) {
               let secondTask = splited[i].split('|');
-
               let winner = secondTask[3].toLowerCase();
               let loser = secondTask[4].toLowerCase();
               let winnerScore = 0;
@@ -714,14 +724,19 @@
                 updated[loser] = 1500;
                 loserScore = 1500;
               }
-              let ubaiai = 16 + (winnerScore - loserScore) / 25;
+              let ubaiai = 16 + (loserScore - winnerScore) / 25;
               ubaiai = Number(ubaiai.toFixed(3));
-              if (ubaiai > 0) {
-                updated[winner] += ubaiai;
-                updated[loser] -= ubaiai;
+              if (ubaiai <= 0) {
+                updated[winner] += 1;
+                updated[loser] -= 1;
               } else {
-                updated[winner] -= ubaiai;
-                updated[loser] += ubaiai;
+                if (ubaiai > 32) {
+                  updated[winner] += 32;
+                  updated[loser] -= 32;
+                } else {
+                  updated[winner] += ubaiai;
+                  updated[loser] -= ubaiai;
+                }
               }
               updatedUsersToday[winner] = updated[winner];
               updatedUsersToday[loser] = updated[loser];
@@ -730,8 +745,8 @@
               splited[i].includes('loss')
             ) {
               let secondTask = splited[i].split('|');
-              let winner = secondTask[3].toLowerCase();
-              let loser = secondTask[4].toLowerCase();
+              let winner = secondTask[4].toLowerCase();
+              let loser = secondTask[3].toLowerCase();
               let winnerScore = 0;
               let loserScore = 0;
               if (updated[winner]) winnerScore = updated[winner];
@@ -744,18 +759,24 @@
                 updated[loser] = 1500;
                 loserScore = 1500;
               }
-              let ubaiai = 16 + (winnerScore - loserScore) / 25;
+              let ubaiai = 16 + (loserScore - winnerScore) / 25;
               ubaiai = Number(ubaiai.toFixed(3));
-              if (ubaiai > 0) {
-                updated[winner] -= ubaiai;
-                updated[loser] += ubaiai;
+              if (ubaiai <= 0) {
+                updated[winner] += 1;
+                updated[loser] -= 1;
               } else {
-                updated[winner] += ubaiai;
-                updated[loser] -= ubaiai;
+                if (ubaiai > 32) {
+                  updated[winner] += 32;
+                  updated[loser] -= 32;
+                } else {
+                  updated[winner] += ubaiai;
+                  updated[loser] -= ubaiai;
+                }
               }
               updatedUsersToday[winner] = updated[winner];
               updatedUsersToday[loser] = updated[loser];
             }
+            console.log(updatedUsersToday);
           }
           // console.log(updated);
           let res = await axios({
@@ -765,7 +786,7 @@
           });
           if (res.data.status == '성공') {
             alert('점수가 업데이트 되었습니다');
-            window.location.reload();
+            // window.location.reload();
           } else {
             alert('점수가 업데이트에 실패하였습니다');
             // alert('오늘 점수는 이미 업데이트 되어있습니다');
