@@ -413,7 +413,11 @@ exports.decay = async (req, res) => {
       const timeDifference = Math.abs(date1 - date2);
       const daysDifference = timeDifference / (1000 * 60 * 60 * 24);
       // console.log(daysDifference);
-      if (daysDifference >= 4 && userLastDecay !== todayString) {
+      if (
+        daysDifference >= 4 &&
+        userLastDecay !== todayString &&
+        ladder[i].dataValues.score > 1400
+      ) {
         let decayAmount2 = (ladder[i].dataValues.decay + 3) * 6;
         await Ladder.update(
           {
