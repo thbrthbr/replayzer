@@ -418,7 +418,10 @@ exports.decay = async (req, res) => {
         await Ladder.update(
           {
             decay: ladder[i].dataValues.decay + 1,
-            score: ladder[i].dataValues.score - decayAmount2,
+            score:
+              ladder[i].dataValues.score - decayAmount2 >= 1400
+                ? ladder[i].dataValues.score - decayAmount2
+                : 1400,
             decayDate: todayString,
           },
           {
