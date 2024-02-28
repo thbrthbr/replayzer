@@ -413,6 +413,7 @@ exports.decay = async (req, res) => {
       const timeDifference = Math.abs(date1 - date2);
       const daysDifference = timeDifference / (1000 * 60 * 60 * 24);
       // console.log(daysDifference);
+      // 다음달부턴 1400 -> 1500으로
       if (
         daysDifference >= 4 &&
         userLastDecay !== todayString &&
