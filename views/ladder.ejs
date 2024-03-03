@@ -602,14 +602,9 @@
               !splited[i].includes(':')
             ) {
               let winner = splited[i].split('has')[0].trim().toLowerCase();
-              // let loser = splited[i]
-              //   .split('against')[1]
-              //   .split('.')[0]
-              //   .trim()
-              //   .toLowerCase();
               let loser = splited[i]
                 .split('against')[1]
-                .slice(0, loser.length - 1)
+                .slice(0, -1)
                 .trim()
                 .toLowerCase();
               let winnerScore = 0;
@@ -651,7 +646,7 @@
               let loser = splited[i].split('has')[0].trim().toLowerCase();
               let winner = splited[i]
                 .split('against')[1]
-                .slice(0, loser.length - 1)
+                .slice(0, -1)
                 .trim()
                 .toLowerCase();
               let winnerScore = 0;
@@ -687,6 +682,7 @@
             }
           }
           // console.log(updated);
+          // console.log(updatedUsersToday);
           let res = await axios({
             method: 'post',
             url: '/updateLadder2',
@@ -782,9 +778,10 @@
               updatedUsersToday[winner] = updated[winner];
               updatedUsersToday[loser] = updated[loser];
             }
-            console.log(updatedUsersToday);
+            // console.log(updatedUsersToday);
           }
           // console.log(updated);
+          // console.log(updatedUsersToday);
           let res = await axios({
             method: 'post',
             url: '/updateLadder2',
