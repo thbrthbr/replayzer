@@ -602,9 +602,14 @@
               !splited[i].includes(':')
             ) {
               let winner = splited[i].split('has')[0].trim().toLowerCase();
+              // let loser = splited[i]
+              //   .split('against')[1]
+              //   .split('.')[0]
+              //   .trim()
+              //   .toLowerCase();
               let loser = splited[i]
                 .split('against')[1]
-                .split('.')[0]
+                .slice(0, loser.length - 1)
                 .trim()
                 .toLowerCase();
               let winnerScore = 0;
@@ -646,7 +651,7 @@
               let loser = splited[i].split('has')[0].trim().toLowerCase();
               let winner = splited[i]
                 .split('against')[1]
-                .split('.')[0]
+                .slice(0, loser.length - 1)
                 .trim()
                 .toLowerCase();
               let winnerScore = 0;
