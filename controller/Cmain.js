@@ -405,36 +405,40 @@ exports.decay = async (req, res) => {
       .replace('T', ' ')
       .replace('.000Z', '');
     let todayString = koreaTimeString.split(' ')[0];
-    let ladder = await Ladder.findAll();
-    for (let i = 0; i < ladder.length; i++) {
-      let userLastDecay = ladder[i].dataValues.decayDate;
-      const date1 = new Date(todayString);
-      const date2 = new Date(ladder[i].dataValues.lastUpdate);
-      const timeDifference = Math.abs(date1 - date2);
-      const daysDifference = timeDifference / (1000 * 60 * 60 * 24);
-      // console.log(daysDifference);
-      // 다음달부턴 1400 -> 1500으로
-      if (
-        daysDifference >= 4 &&
-        userLastDecay !== todayString &&
-        ladder[i].dataValues.score > 1400
-      ) {
-        let decayAmount2 = (ladder[i].dataValues.decay + 3) * 6;
-        await Ladder.update(
-          {
-            decay: ladder[i].dataValues.decay + 1,
-            score:
-              ladder[i].dataValues.score - decayAmount2 >= 1400
-                ? ladder[i].dataValues.score - decayAmount2
-                : 1400,
-            decayDate: todayString,
-          },
-          {
-            where: {
-              user: ladder[i].dataValues.user,
+    let check = await Ladder.findOne({ where: { decayDate: todayString } });
+    if (check) {
+      let ladder = await Ladder.findAll();
+      for (let i = 0; i < ladder.length; i++) {
+        let userLastDecay = ladder[i].dataValues.decayDate;
+        const date1 = new Date(todayString);
+        const date2 = new Date(ladder[i].dataValues.lastUpdate);
+        const timeDifference = Math.abs(date1 - date2);
+        const daysDifference = timeDifference / (1000 * 60 * 60 * 24);
+        // console.log(daysDifference);
+        // 다음달부턴 1400 -> 1500으로
+        // 다음달부턴 4 -> 7로
+        if (
+          daysDifference >= 4 &&
+          userLastDecay !== todayString &&
+          ladder[i].dataValues.score > 1400
+        ) {
+          let decayAmount2 = (ladder[i].dataValues.decay + 3) * 6;
+          await Ladder.update(
+            {
+              decay: ladder[i].dataValues.decay + 1,
+              score:
+                ladder[i].dataValues.score - decayAmount2 >= 1400
+                  ? ladder[i].dataValues.score - decayAmount2
+                  : 1400,
+              decayDate: todayString,
             },
-          },
-        );
+            {
+              where: {
+                user: ladder[i].dataValues.user,
+              },
+            },
+          );
+        }
       }
     }
     res.send({ status: '성공' });
