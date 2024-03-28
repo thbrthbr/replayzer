@@ -273,6 +273,10 @@ exports.getCards = async (req, res) => {
 };
 exports.getLadder = async (req, res) => {
   let ladder = await Ladder.findAll();
+  // let temp = ladder.slice();
+  // temp = temp.sort((x, y) => y.score - x.score);
+  // let decayers = temp.slice(0, 4);
+  // console.log(decayers.map((user) => user.dataValues.score));
   let pwList = [
     process.env.DB_PW,
     process.env.DB_STAFF_FIR_PW,
@@ -408,33 +412,34 @@ exports.decay = async (req, res) => {
     let check = await Ladder.findOne({ where: { decayDate: todayString } });
     if (check) {
       let ladder = await Ladder.findAll();
-      for (let i = 0; i < ladder.length; i++) {
-        let userLastDecay = ladder[i].dataValues.decayDate;
+      let temp = ladder.slice();
+      temp = temp.sort((x, y) => y.score - x.score);
+      let decayers = temp.slice(0, 4);
+      for (let i = 0; i < decayers.length; i++) {
+        let userLastDecay = decayers[i].dataValues.decayDate;
         const date1 = new Date(todayString);
-        const date2 = new Date(ladder[i].dataValues.lastUpdate);
+        const date2 = new Date(decayers[i].dataValues.lastUpdate);
         const timeDifference = Math.abs(date1 - date2);
         const daysDifference = timeDifference / (1000 * 60 * 60 * 24);
         // console.log(daysDifference);
-        // 다음달부턴 1400 -> 1500으로
-        // 다음달부턴 4 -> 7로
         if (
-          daysDifference >= 4 &&
+          daysDifference >= 7 &&
           userLastDecay !== todayString &&
-          ladder[i].dataValues.score > 1400
+          decayers[i].dataValues.score > 1500
         ) {
-          let decayAmount2 = (ladder[i].dataValues.decay + 3) * 6;
+          let decayAmount2 = (decayers[i].dataValues.decay + 3) * 6;
           await Ladder.update(
             {
-              decay: ladder[i].dataValues.decay + 1,
+              decay: decayers[i].dataValues.decay + 1,
               score:
-                ladder[i].dataValues.score - decayAmount2 >= 1400
-                  ? ladder[i].dataValues.score - decayAmount2
-                  : 1400,
+                decayers[i].dataValues.score - decayAmount2 >= 1500
+                  ? decayers[i].dataValues.score - decayAmount2
+                  : 1500,
               decayDate: todayString,
             },
             {
               where: {
-                user: ladder[i].dataValues.user,
+                user: decayers[i].dataValues.user,
               },
             },
           );
