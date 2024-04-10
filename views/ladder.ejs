@@ -604,8 +604,8 @@
               let winner = splited[i].split('has')[0].trim().toLowerCase();
               let loser = splited[i]
                 .split('against')[1]
-                .slice(0, -1)
                 .trim()
+                .slice(0, -1)
                 .toLowerCase();
               let winnerScore = 0;
               let loserScore = 0;
@@ -636,6 +636,7 @@
               }
               updatedUsersToday[winner] = updated[winner];
               updatedUsersToday[loser] = updated[loser];
+              // console.log(updatedUsersToday);
               // console.log(updated);
             } else if (
               splited[i].includes('has') &&
@@ -646,8 +647,8 @@
               let loser = splited[i].split('has')[0].trim().toLowerCase();
               let winner = splited[i]
                 .split('against')[1]
-                .slice(0, -1)
                 .trim()
+                .slice(0, -1)
                 .toLowerCase();
               let winnerScore = 0;
               let loserScore = 0;
@@ -680,6 +681,7 @@
               updatedUsersToday[winner] = updated[winner];
               updatedUsersToday[loser] = updated[loser];
             }
+            // console.log(updatedUsersToday);
           }
           // console.log(updated);
           // console.log(updatedUsersToday);
@@ -778,7 +780,7 @@
               updatedUsersToday[winner] = updated[winner];
               updatedUsersToday[loser] = updated[loser];
             }
-            // console.log(updatedUsersToday);
+            console.log(updatedUsersToday);
           }
           // console.log(updated);
           // console.log(updatedUsersToday);
