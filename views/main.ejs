@@ -399,7 +399,16 @@
             }
           });
         } else {
-          search();
+          var sel_type = '';
+          var chk_radio = document.getElementsByName('search-type');
+          for (var i = 0; i < chk_radio.length; i++) {
+            if (chk_radio[i].checked == true) {
+              sel_type = chk_radio[i].value;
+            }
+          }
+          if (sel_type == 'proper') {
+            search();
+          }
         }
       };
       let observer = new IntersectionObserver(loadLists);
@@ -644,9 +653,11 @@
         loader.innerText = 'Load more';
         searchPage = 0;
         search();
+        console.log('에에??');
       };
 
       const search = async () => {
+        console.log('네??');
         let keyword = document.querySelector('.search-input').value;
         keyword = keyword.replace(' ', '_');
         searchKeyword = keyword;
@@ -672,6 +683,7 @@
           });
         }
         if (res.data.status == '성공') {
+          // console.log('성공~');
           let list = res.data.data;
           if (list.length > 0) {
             let ul = document.querySelector('#list');
@@ -753,9 +765,6 @@
               } else {
                 loader.innerText = '';
               }
-            }
-            if (ul.children.length < 10) {
-              search();
             }
           } else {
             if (searchPage == 1) {
