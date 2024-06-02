@@ -103,12 +103,9 @@ exports.remove = async (req, res) => {
 };
 
 exports.replayShow = async (req, res) => {
-  // console.log(req.session.which.id);
-  let check = parseInt(req.session.which.id);
   let response;
   let numbering = parseInt(req.session.which.id);
-  console.log(check);
-  if (isNaN(check)) {
+  if (isNaN(req.session.which.id)) {
     response = await List.findOne({
       where: { privateURL: req.session.which.id },
     });
@@ -122,6 +119,7 @@ exports.replayShow = async (req, res) => {
       if (err) throw err;
       data.forEach((item, i) => {
         if (item == response.fileName) {
+          console.log('이거요 ', item);
           flag++;
         }
       });
